@@ -63,7 +63,9 @@ class GroupController extends Controller
     public function show(Group $group)
     {
         Gate::authorize('view', $group);
-        $group = Group::with('users', 'sharedDebts')->findOrFail($group->id);
+        $group = Group::with(['users', 'sharedDebts', 'transactions' => function ($query) {
+            $query->with(['payer', 'recipient']);  // Eager load payer and recipient
+        }])->findOrFail($group->id);
         $userDebts = $group->calculateUserDebts();
         return view('groups.show', compact('group', 'userDebts'));
     }

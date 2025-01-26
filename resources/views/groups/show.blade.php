@@ -39,7 +39,7 @@
 
 
         <div class="bg-white rounded-lg shadow p-6 mb-8">
-            <h2 class="text-xl font-semibold text-gray-800 mb-4">Shared Debts</h2>
+             <h2 class="text-xl font-semibold text-gray-800 mb-4">Shared Debts</h2>
             <ul class="divide-y divide-gray-200">
                 @forelse($group->sharedDebts as $debt)
                     <li class="py-4">
@@ -49,24 +49,23 @@
                                 <span class="text-gray-600"> - €{{ number_format($debt->amount, 2) }}</span>
                             </div>
                             <div class="flex items-center space-x-4">
-                                @if($debt->created_by === Auth::id())
-                                    <form action="{{ route('sharedDebts.destroy', $debt->id) }}" method="POST">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="text-red-500 hover:text-red-700 focus:outline-none">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline-block align-middle" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                            </svg>
-                                        </button>
-                                    </form>
-                                @else
                                 <div class="text-gray-500 text-sm">
-                                    Created by: <span class="font-medium">{{ $debt->creator->name }}</span>
+                                     Created by: <span class="font-medium">{{ $debt->creator->name }}</span>
                                 </div>
+                                @if($debt->created_by === Auth::id())
+                                <form action="{{ route('sharedDebts.destroy', $debt->id) }}" method="POST">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="text-red-500 hover:text-red-700 focus:outline-none">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline-block align-middle" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                    </button>
+                                </form>
                                 @endif
                             </div>
                         </div>
-                        <div class="flex flex-wrap gap-2 mt-2">
+                       <div class="flex flex-wrap gap-2 mt-2">
                              @foreach($debt->getUserShares() as $share)
                                 <span class="bg-yellow-100 text-yellow-800  font-medium text-sm py-1 px-2 rounded-full">{{ $share['user']->name }}: €{{ $share['amount'] }}</span>
                             @endforeach
@@ -78,24 +77,24 @@
             </ul>
         </div>
 
-        <div class="bg-white rounded-lg shadow p-6">
+        <div class="bg-white rounded-lg shadow p-6 mb-8">
             <h2 class="text-xl font-semibold text-gray-800 mb-4">Add Shared Debt</h2>
-            <form action="{{ route('sharedDebts.store') }}" method="POST">
+            <form action="{{ route('sharedDebts.store') }}" method="POST" class="space-y-4">
                 @csrf
                 <input type="hidden" name="group_id" value="{{ $group->id }}">
 
-                <div class="mb-4">
-                    <label for="name" class="block text-gray-700 text-sm font-medium mb-2">Debt Name</label>
-                    <input type="text" name="name" id="name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                 <div>
+                    <label for="name" class="block text-sm font-medium text-gray-700">Debt Name</label>
+                    <input type="text" name="name" id="name" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
                 </div>
 
-                <div class="mb-4">
-                    <label for="amount" class="block text-gray-700 text-sm font-medium mb-2">Amount (€)</label>
-                    <input type="number" step="0.01" name="amount" id="amount" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                <div>
+                    <label for="amount" class="block text-sm font-medium text-gray-700">Amount (€)</label>
+                    <input type="number" step="0.01" name="amount" id="amount" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
                 </div>
 
-                <div class="mb-4">
-                    <label for="members" class="block text-gray-700 text-sm font-medium mb-2">Split Between</label>
+                <div>
+                    <label for="members" class="block text-sm font-medium text-gray-700">Split Between</label>
                     <div class="mt-2 space-y-2">
                         @foreach($group->users as $user)
                             <div class="flex items-center">
@@ -114,7 +113,74 @@
                     </div>
                 </div>
 
-                <button type="submit" class="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Add Debt</button>
+                <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Add Debt</button>
+
+            </form>
+        </div>
+
+
+        <div class="bg-white rounded-lg shadow p-6 mb-8">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Transactions</h2>
+            <ul class="divide-y divide-gray-200">
+                @forelse($group->transactions as $transaction)
+                    <li class="py-4">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <span class="font-semibold text-gray-800">{{ $transaction->description ?? 'Transaction' }}</span>
+                                <span class="text-gray-600"> - €{{ number_format($transaction->amount, 2) }}</span>
+                                <div class="text-gray-500 text-sm">
+                                    Payer: <span class="font-medium">{{ $transaction->payer->name }}</span> to Recipient: <span class="font-medium">{{ $transaction->recipient->name }}</span>
+                                </div>
+                            </div>
+                            @if($transaction->payer_id === Auth::id())
+                            <form action="{{ route('transactions.destroy', $transaction->id) }}" method="POST">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="text-red-500 hover:text-red-700 ml-2 focus:outline-none">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline-block align-middle" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                </button>
+                            </form>
+                             @endif
+                        </div>
+                    </li>
+                @empty
+                    <li class="px-6 py-4 text-gray-500">No transactions yet.</li>
+                @endforelse
+            </ul>
+        </div>
+
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Add Transaction</h2>
+            <form action="{{ route('transactions.store') }}" method="POST" class="space-y-4">
+                @csrf
+                <input type="hidden" name="group_id" value="{{ $group->id }}">
+                <input type="hidden" name="payer_id" value="{{ auth()->id() }}">
+
+                <div>
+                    <label for="recipient_id" class="block text-sm font-medium text-gray-700">Recipient</label>
+                    <select name="recipient_id" id="recipient_id" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
+                        <option value="">Select Recipient</option>
+                        @foreach($group->users as $user)
+                            @if($user->id !== auth()->id())
+                                <option value="{{ $user->id }}">{{ $user->name }}</option>
+                            @endif
+                        @endforeach
+                    </select>
+                </div>
+
+                <div>
+                    <label for="amount" class="block text-sm font-medium text-gray-700">Amount (€)</label>
+                    <input type="number" step="0.01" name="amount" id="amount" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" required>
+                </div>
+
+                 <div>
+                    <label for="description" class="block text-sm font-medium text-gray-700">Description (optional)</label>
+                    <input type="text" name="description" id="description" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                </div>
+
+                <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Add Transaction</button>
             </form>
         </div>
     </div>

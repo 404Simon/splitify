@@ -3,6 +3,7 @@
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SharedDebtController;
+use App\Http\Controllers\TransactionController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -26,4 +27,7 @@ Route::resource('sharedDebts', SharedDebtController::class)
     ->only(['store', 'destroy'])
     ->middleware(['auth']);
 
+Route::resource('transactions', TransactionController::class)
+    ->only(['store', 'destroy'])
+    ->middleware(['auth']);
 require __DIR__ . '/auth.php';
