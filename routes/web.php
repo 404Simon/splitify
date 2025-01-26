@@ -23,7 +23,7 @@ Route::resource('groups', GroupController::class)
     ->middleware(['auth']);
 
 Route::resource('sharedDebts', SharedDebtController::class)
-    ->only(["store"])
+    ->only(['store', 'destroy'])
     ->middleware(['auth']);
 
 require __DIR__ . '/auth.php';

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Group;
 use App\Models\SharedDebt;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class SharedDebtController extends Controller
 {
@@ -98,6 +99,11 @@ class SharedDebtController extends Controller
      */
     public function destroy(SharedDebt $sharedDebt)
     {
-        //
+        Gate::authorize('delete', $sharedDebt);
+        $sharedDebt->delete();
+
+        return redirect()
+            ->route('groups.show', $sharedDebt['group_id'])
+            ->with('success', 'Shared debt added successfully!');
     }
 }
