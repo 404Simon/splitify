@@ -1,11 +1,11 @@
-<div class="user-display bg-white p-4 rounded-lg shadow-md flex items-center space-x-4">
-    <div>
-        <h3 class="font-semibold text-lg text-gray-800">{{ $user->name }}</h3>
+<div class="bg-white p-3 rounded-md shadow-sm flex items-center justify-between text-sm text-gray-700">
+    <div class="flex items-center space-x-2">
+       <span class="font-medium">{{ $user->name }}</span>
+         @if ($isCurrentUser())
+            <span class="bg-green-100 text-green-600 font-semibold px-2 py-0.5 rounded-full text-xs">You</span>
+        @endif
+        @if ($isGroupAdmin)
+            <span class="bg-red-100 text-red-600 font-semibold px-2 py-0.5 rounded-full text-xs">Admin</span>
+        @endif
     </div>
-    @if ($isCurrentUser())
-        <span class="text-green-500 font-semibold text-sm">You</span>
-    @endif
-    @if ($isGroupAdmin)
-        <span class="text-red-500 font-semibold text-sm">Admin</span>
-    @endif
 </div>
