@@ -20,9 +20,9 @@ class SharedDebtController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Group $group)
     {
-        //
+        return view('sharedDebts.create', compact('group'));
     }
 
     /**
@@ -104,6 +104,6 @@ class SharedDebtController extends Controller
 
         return redirect()
             ->route('groups.show', $sharedDebt['group_id'])
-            ->with('success', 'Shared debt added successfully!');
+            ->with('success', 'Shared debt deleted successfully!');
     }
 }

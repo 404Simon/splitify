@@ -9,6 +9,11 @@ use Illuminate\Support\Facades\Gate;
 
 class TransactionController extends Controller
 {
+    public function create(Group $group)
+    {
+        return view('transactions.create', compact('group'));
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -34,7 +39,9 @@ class TransactionController extends Controller
 
         Transaction::create($validated);
 
-        return back()->with('success', 'Transaction added successfully!');
+        return redirect()
+            ->route('groups.show', $validated['group_id'])
+            ->with('success', 'Transaction added successfully!');
     }
 
     public function destroy(Transaction $transaction)
