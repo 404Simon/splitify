@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SharedDebtController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -19,6 +20,10 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::resource('groups', GroupController::class)
+    ->middleware(['auth']);
+
+Route::resource('sharedDebts', SharedDebtController::class)
+    ->only(["store"])
     ->middleware(['auth']);
 
 require __DIR__ . '/auth.php';
