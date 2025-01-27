@@ -40,7 +40,6 @@ jobs:
           cp -r public/* "$DEPLOY_DIR"
           cp -r vendor "$DEPLOY_DIR"
           cp -r bootstrap "$DEPLOY_DIR"
-          cp .env "$DEPLOY_DIR"
 
           find . -maxdepth 1 \
               \( -path "./$DEPLOY_DIR" -prune \) -o \
