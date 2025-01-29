@@ -11,7 +11,7 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', function () {
-    return view('dashboard');
+    return redirect('groups.index');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
@@ -19,19 +19,19 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    Route::resource('groups', GroupController::class)->except(['show']);  // Exclude 'show' from top-level resource if you moved it above
+    Route::resource('groups', GroupController::class)->except(['show']);
 
     Route::prefix('groups/{group}')->name('groups.')->group(function () {
-        Route::get('/', [GroupController::class, 'show'])->name('show');  // Keep the group show route here if it was removed
+        Route::get('/', [GroupController::class, 'show'])->name('show');
         Route::get('/sharedDebts/create', [SharedDebtController::class, 'create'])->name('sharedDebts.create');
         Route::get('/transactions/create', [TransactionController::class, 'create'])->name('transactions.create');
     });
 
     Route::resource('sharedDebts', SharedDebtController::class)
-        ->only(['store', 'destroy']);  // Keep only store and destroy for sharedDebts resource
+        ->only(['store', 'destroy']);
 
     Route::resource('transactions', TransactionController::class)
-        ->only(['store', 'destroy']);  // Keep only store and destroy for transactions resource
+        ->only(['store', 'destroy']);
 });
 
 require __DIR__ . '/auth.php';
