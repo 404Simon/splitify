@@ -40,6 +40,11 @@ class GroupPolicy
         return $group->created_by === $user->id;
     }
 
+    public function generateInvite(User $user, Group $group)
+    {
+        return $group->created_by === $user->id;
+    }
+
     /**
      * Determine whether the user can delete the model.
      */

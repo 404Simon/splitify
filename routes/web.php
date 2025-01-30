@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\GroupController;
+use App\Http\Controllers\InviteController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SharedDebtController;
 use App\Http\Controllers\TransactionController;
@@ -9,6 +10,8 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return redirect()->route('groups.index');
 });
+
+Route::resource('invite', InviteController::class);
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -19,6 +22,7 @@ Route::middleware('auth')->group(function () {
 
     Route::prefix('groups/{group}')->name('groups.')->group(function () {
         Route::get('/', [GroupController::class, 'show'])->name('show');
+        Route::post('/generate-invite', [GroupController::class, 'generateInvite'])->name('groups.generateInvite');
         Route::get('/sharedDebts/create', [SharedDebtController::class, 'create'])->name('sharedDebts.create');
         Route::get('/transactions/create', [TransactionController::class, 'create'])->name('transactions.create');
     });

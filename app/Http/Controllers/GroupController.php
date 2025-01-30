@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Group;
+use App\Models\Invite;
 use App\Models\User;
+use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
@@ -104,6 +107,19 @@ class GroupController extends Controller
         $group->save();
 
         return redirect()->route('groups.index')->with('success', 'Group updated successfully!');
+    }
+
+    public function generateInvite(Request $request, Group $group): JsonResponse
+    {
+        Gate::authorize('generateInvite', $group);
+
+        $invite = Invite::create([
+            'group_id' => $group->id,
+        ]);
+
+        $inviteLink = route('invite.show', ['invite' => $invite->uuid]);
+
+        return response()->json(['inviteLink' => $inviteLink]);
     }
 
     /**
