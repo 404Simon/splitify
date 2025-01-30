@@ -4,6 +4,46 @@
             {{ $group->name }}
         </h1>
 
+        <div class="py-12" x-data="{
+            inviteLink: '',
+            showInviteLinkSection: false,
+            copyToClipboard() { navigator.clipboard.writeText(this.inviteLink).then(() => { alert('Invite link copied to clipboard!'); }); },
+            generateInviteLink() {
+                showInviteLinkSection = false;
+                inviteLink = '';
+                fetch('/groups/{{ $group->id }}/generate-invite', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' } }).then(response => response.json()).then(data => {
+                    this.inviteLink = data.inviteLink;
+                    this.showInviteLinkSection = true;
+                });
+            }
+        }">
+            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                    <div class="p-6 bg-white border-b border-gray-200">
+                        <h3 class="text-lg font-semibold mb-4">Group Name: {{ $group->name }}</h3>
+
+                        <button x-on:click="generateInviteLink()"
+                            class="inline-flex items-center px-4 py-2 bg-blue-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-400 active:bg-blue-600 focus:outline-none focus:border-blue-600 focus:ring focus:ring-blue-300 disabled:opacity-25 transition ease-in-out duration-150 mb-4">
+                            Generate Invite Link
+                        </button>
+
+                        <div x-show="showInviteLinkSection" id="inviteLinkSection" class="mt-4">
+                            <p class="font-semibold">Invite Link:</p>
+                            <div id="inviteLinkDisplay" class="bg-gray-100 p-2 rounded-md break-all"
+                                x-text="inviteLink">
+                            </div>
+                            <button x-on:click="copyToClipboard()" id="copyInviteLinkButton"
+                                class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring focus:ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150 mt-2">
+                                Copy Link
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
         <div class="mb-4">
             <div class="inline-flex space-x-4">
                 <a href="{{ route('groups.sharedDebts.create', $group->id) }}"
