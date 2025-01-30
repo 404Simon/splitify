@@ -41,7 +41,7 @@ class GroupController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'members' => 'required|array',  // Array of user IDs
+            'members' => 'array',  // Array of user IDs
             'members.*' => 'exists:users,id',  // Ensure each ID exists in the users table
         ]);
 
@@ -52,7 +52,9 @@ class GroupController extends Controller
 
         $group->users()->attach(auth()->id());
 
-        $group->users()->attach($validated['members']);
+        if (array_key_exists('members', $validated)) {
+            $group->users()->attach($validated['members']);
+        }
 
         return redirect()->route('groups.index')->with('success', 'Group created successfully!');
     }
