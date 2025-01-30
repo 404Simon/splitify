@@ -87,13 +87,17 @@ class GroupController extends Controller
     public function update(Request $request, Group $group)
     {
         Gate::authorize('update', $group);
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:32',
             'members' => 'array|exists:users,id',
         ]);
 
-        $group->name = $request->input('name');
-        $group->users()->sync($request->input('members'));  // Sync the group members (remove and add as necessary)
+        if (!collect($validated['members'])->contains(auth()->id())) {
+            return redirect()->back()->with('error', 'You cannot remove yourself from the group!');
+        }
+
+        $group->name = $validated['name'];
+        $group->users()->sync($validated['members']);
 
         $group->save();
 
