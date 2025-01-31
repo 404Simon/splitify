@@ -11,7 +11,10 @@ class Invite extends Model
     public $incrementing = false;
 
     protected $fillable = [
-        'group_id'
+        'group_id',
+        'name',
+        'is_reusable',
+        'duration_days'
     ];
 
     protected static function booted(): void
@@ -19,6 +22,12 @@ class Invite extends Model
         static::creating(function (Model $model) {
             if (empty($model->uuid)) {
                 $model->uuid = Str::uuid()->toString();
+            }
+            if (empty($model->is_reusable)) {
+                $model->is_reusable = false;
+            }
+            if (empty($model->duration_days)) {
+                $model->duration_days = 1;
             }
         });
     }
