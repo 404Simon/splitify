@@ -13,6 +13,9 @@ return new class extends Migration {
         Schema::create('invites', function (Blueprint $table) {
             $table->uuid('uuid')->primary();
             $table->foreignId('group_id')->constrained()->cascadeOnDelete();
+            $table->string('name')->nullable();
+            $table->boolean('is_reusable')->default(false);
+            $table->unsignedTinyInteger('duration_days')->default(1);
             $table->timestamps();
         });
     }

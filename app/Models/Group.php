@@ -25,6 +25,11 @@ class Group extends Model
         return $this->hasMany(Transaction::class);
     }
 
+    public function invites(): HasMany
+    {
+        return $this->hasMany(Invite::class);
+    }
+
     public function calculateUserDebts()
     {
         $debts = [];

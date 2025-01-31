@@ -109,19 +109,6 @@ class GroupController extends Controller
         return redirect()->route('groups.index')->with('success', 'Group updated successfully!');
     }
 
-    public function generateInvite(Request $request, Group $group): JsonResponse
-    {
-        Gate::authorize('generateInvite', $group);
-
-        $invite = Invite::create([
-            'group_id' => $group->id,
-        ]);
-
-        $inviteLink = route('invite.show', ['invite' => $invite->uuid]);
-
-        return response()->json(['inviteLink' => $inviteLink]);
-    }
-
     /**
      * Remove the specified resource from storage.
      */
