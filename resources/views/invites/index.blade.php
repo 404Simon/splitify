@@ -39,7 +39,7 @@
                                 <div class="mt-1 flex items-center">
                                     <div class="text-gray-500 text-sm dark:text-gray-400 truncate mr-2"
                                         id="inviteLink-{{ $invite->id }}" x-ref="inviteLinkText">
-                                        {{ route('invite.show', $invite->uuid) }}
+                                        {{ route('invites.show', $invite->uuid) }}
                                     </div>
                                     <button
                                         class="text-indigo-500 hover:text-indigo-700 focus:outline-none dark:text-indigo-400 dark:hover:text-indigo-500"

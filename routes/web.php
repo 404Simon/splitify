@@ -12,7 +12,7 @@ Route::get('/', function () {
     return redirect()->route('groups.index');
 });
 
-Route::get('invite', [InviteController::class, 'show'])->name('invite.show');
+Route::get('invite/{uuid}', [InviteController::class, 'show'])->name('invites.show');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -20,10 +20,12 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::resource('groups', GroupController::class)->except(['show']);
+    Route::post('invites/{invite}/accept', [InviteController::class, 'accept'])->name('invites.accept');
+    Route::post('invites/{invite}/deny', [InviteController::class, 'deny'])->name('invites.deny');
 
     Route::prefix('groups/{group}')->name('groups.')->group(function () {
         Route::get('/', [GroupController::class, 'show'])->name('show');
-        Route::resource('invites', InviteController::class)->middleware(EnsureIsGroupAdmin::class);
+        Route::resource('invites', InviteController::class)->only(['index', 'create', 'destroy', 'store'])->middleware(EnsureIsGroupAdmin::class);
         Route::post('/generate-invite', [GroupController::class, 'generateInvite'])->name('groups.generateInvite');
         Route::get('/sharedDebts/create', [SharedDebtController::class, 'create'])->name('sharedDebts.create');
         Route::get('/transactions/create', [TransactionController::class, 'create'])->name('transactions.create');

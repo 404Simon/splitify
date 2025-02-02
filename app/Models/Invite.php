@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
@@ -35,5 +36,20 @@ class Invite extends Model
     public function group()
     {
         return $this->belongsTo(Group::class);
+    }
+
+    /**
+     * Check if the invite is still valid.
+     *
+     * @return bool
+     */
+    public function isValid(): bool
+    {
+        if ($this->duration_days <= 0) {
+            return false;
+        }
+
+        $expirationDate = $this->created_at->addDays($this->duration_days);
+        return Carbon::now()->isBefore($expirationDate);
     }
 }

@@ -3,10 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Group;
-use App\Models\Invite;
 use App\Models\User;
-use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
@@ -44,8 +41,6 @@ class GroupController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'members' => 'array',  // Array of user IDs
-            'members.*' => 'exists:users,id',  // Ensure each ID exists in the users table
         ]);
 
         $group = Group::create([
@@ -54,10 +49,6 @@ class GroupController extends Controller
         ]);
 
         $group->users()->attach(auth()->id());
-
-        if (array_key_exists('members', $validated)) {
-            $group->users()->attach($validated['members']);
-        }
 
         return redirect()->route('groups.index')->with('success', 'Group created successfully!');
     }
