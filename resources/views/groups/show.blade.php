@@ -6,17 +6,21 @@
         <div class="mb-4">
             <div class="inline-flex space-x-4">
                 <a href="{{ route('groups.sharedDebts.create', $group->id) }}"
-                    class="inline-flex items-center px-4 py-2 bg-red-500 hover:bg-red-700 text-white text-sm font-medium rounded-md dark:bg-red-600 dark:hover:bg-red-700">
-                    Add Debt
+                    class="inline-flex items-center px-4 py-2 bg-red-600 hover:bg-red-800 text-white text-sm font-medium rounded-md dark:bg-red-700 dark:hover:bg-red-800">
+                    💰 Add Debt
                 </a>
                 <a href="{{ route('groups.transactions.create', $group->id) }}"
-                    class="inline-flex items-center px-4 py-2 bg-green-500 hover:bg-green-700 text-white text-sm font-medium rounded-md dark:bg-green-600 dark:hover:bg-green-700">
-                    Add Transaction
+                    class="inline-flex items-center px-4 py-2 bg-emerald-500 hover:bg-emerald-700 text-white text-sm font-medium rounded-md dark:bg-emerald-600 dark:hover:bg-emerald-700">
+                    💸 Add Transaction
+                </a>
+                <a href="{{ route('groups.mapMarkers.index', $group->id) }}"
+                    class="inline-flex items-center px-4 py-2 bg-indigo-500 hover:bg-indigo-700 text-white text-sm font-medium rounded-md dark:bg-indigo-600 dark:hover:bg-indigo-700">
+                    🗺️ Map
                 </a>
                 @if ($group->created_by === Auth::id())
                     <a href="{{ route('groups.invites.index', $group->id) }}"
                         class="inline-flex items-center px-4 py-2 bg-blue-500 hover:bg-blue-700 text-white text-sm font-medium rounded-md dark:bg-blue-600 dark:hover:bg-blue-700">
-                        Invites
+                        ✉️ Invites
                     </a>
                 @endif
             </div>
