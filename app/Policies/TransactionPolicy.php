@@ -37,7 +37,7 @@ class TransactionPolicy
      */
     public function update(User $user, Transaction $transaction): bool
     {
-        return false;
+        return $transaction->payer_id === $user->id;
     }
 
     /**

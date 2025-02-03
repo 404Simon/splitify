@@ -79,7 +79,13 @@
                                         class="font-medium dark:text-white">{{ $debt->creator->name }}</span>
                                 </div>
                                 @if ($debt->created_by === Auth::id())
-                                    <form action="{{ route('sharedDebts.destroy', $debt->id) }}" method="POST">
+                                    <a href="{{ route('groups.sharedDebts.edit', ['group' => $group->id, 'sharedDebt' => $debt->id]) }}"
+                                        class="text-blue-500 hover:text-blue-700 focus:outline-none dark:text-blue-400 dark:hover:text-blue-500">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 inline-block align-middle">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125" />
+                                        </svg>
+                                    </a>
+                                    <form action="{{ route('groups.sharedDebts.destroy', ['group' => $group->id, 'sharedDebt' => $debt->id]) }}" method="POST">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit"
@@ -128,21 +134,29 @@
                                         class="font-medium dark:text-white">{{ $transaction->recipient->name }}</span>
                                 </div>
                             </div>
-                            @if ($transaction->payer_id === Auth::id())
-                                <form action="{{ route('transactions.destroy', $transaction->id) }}" method="POST">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit"
-                                        class="text-red-500 hover:text-red-700 ml-2 focus:outline-none dark:text-red-400 dark:hover:text-red-500">
-                                        <svg xmlns="http://www.w3.org/2000/svg"
-                                            class="h-4 w-4 inline-block align-middle" fill="none" viewBox="0 0 24 24"
-                                            stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            <div class="flex items-center space-x-4">
+                                @if ($transaction->payer_id === Auth::id())
+                                    <a href="{{ route('groups.transactions.edit', ['group' => $group->id, 'transaction' => $transaction->id]) }}"
+                                        class="text-blue-500 hover:text-blue-700 focus:outline-none dark:text-blue-400 dark:hover:text-blue-500">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 inline-block align-middle">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125" />
                                         </svg>
-                                    </button>
-                                </form>
-                            @endif
+                                    </a>
+                                    <form action="{{ route('groups.transactions.destroy', ['group' => $group->id, 'transaction' => $transaction->id]) }}" method="POST">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit"
+                                            class="text-red-500 hover:text-red-700 ml-2 focus:outline-none dark:text-red-400 dark:hover:text-red-500">
+                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                class="h-4 w-4 inline-block align-middle" fill="none" viewBox="0 0 24 24"
+                                                stroke="currentColor" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            </svg>
+                                        </button>
+                                    </form>
+                                @endif
+                            </div>
                         </div>
                     </li>
                 @empty

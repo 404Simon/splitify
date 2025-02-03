@@ -28,18 +28,12 @@ Route::middleware('auth')->group(function () {
     Route::prefix('groups/{group}')->name('groups.')->middleware(EnsureIsGroupMember::class)->group(function () {
         Route::get('/', [GroupController::class, 'show'])->name('show');
         Route::resource('invites', InviteController::class)->only(['index', 'create', 'destroy', 'store'])->middleware(EnsureIsGroupAdmin::class);
-        Route::post('/generate-invite', [GroupController::class, 'generateInvite'])->name('groups.generateInvite');
-        Route::get('/sharedDebts/create', [SharedDebtController::class, 'create'])->name('sharedDebts.create');
-        Route::get('/transactions/create', [TransactionController::class, 'create'])->name('transactions.create');
-        Route::get('map', [MapController::class, 'displayMap'])->name('map.display');
+        Route::resource('sharedDebts', SharedDebtController::class);
+        Route::resource('transactions', TransactionController::class);
         Route::resource('mapMarkers', MapController::class);
+        // Route::post('/generate-invite', [GroupController::class, 'generateInvite'])->name('groups.generateInvite');
+        Route::get('map', [MapController::class, 'displayMap'])->name('map.display');
     });
-
-    Route::resource('sharedDebts', SharedDebtController::class)
-        ->only(['store', 'destroy']);
-
-    Route::resource('transactions', TransactionController::class)
-        ->only(['store', 'destroy']);
 });
 
 require __DIR__ . '/auth.php';

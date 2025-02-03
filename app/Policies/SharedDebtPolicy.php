@@ -37,7 +37,7 @@ class SharedDebtPolicy
      */
     public function update(User $user, SharedDebt $sharedDebt): bool
     {
-        return false;
+        return $sharedDebt->created_by === $user->id;
     }
 
     /**
