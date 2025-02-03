@@ -18,8 +18,8 @@ return new class extends Migration {
             $table->string('name');
             $table->string('description');
             $table->string('address');
-            $table->integer('lat');
-            $table->integer('lon');
+            $table->double('lat');
+            $table->double('lon');
             $table->timestamps();
         });
     }
