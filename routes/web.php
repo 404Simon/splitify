@@ -2,10 +2,12 @@
 
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\InviteController;
+use App\Http\Controllers\MapController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SharedDebtController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Middleware\EnsureIsGroupAdmin;
+use App\Http\Middleware\EnsureIsGroupMember;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -23,12 +25,14 @@ Route::middleware('auth')->group(function () {
     Route::post('invites/{invite}/accept', [InviteController::class, 'accept'])->name('invites.accept');
     Route::post('invites/{invite}/deny', [InviteController::class, 'deny'])->name('invites.deny');
 
-    Route::prefix('groups/{group}')->name('groups.')->group(function () {
+    Route::prefix('groups/{group}')->name('groups.')->middleware(EnsureIsGroupMember::class)->group(function () {
         Route::get('/', [GroupController::class, 'show'])->name('show');
         Route::resource('invites', InviteController::class)->only(['index', 'create', 'destroy', 'store'])->middleware(EnsureIsGroupAdmin::class);
         Route::post('/generate-invite', [GroupController::class, 'generateInvite'])->name('groups.generateInvite');
         Route::get('/sharedDebts/create', [SharedDebtController::class, 'create'])->name('sharedDebts.create');
         Route::get('/transactions/create', [TransactionController::class, 'create'])->name('transactions.create');
+        Route::get('map', [MapController::class, 'displayMap'])->name('map.display');
+        Route::resource('mapMarkers', MapController::class);
     });
 
     Route::resource('sharedDebts', SharedDebtController::class)
