@@ -48,7 +48,7 @@ class MapController extends Controller
             'address' => $validated['address'],
             'lat' => $validated['lat'],
             'lon' => $validated['lon'],
-            'emoji' => $validated['icon'] ?? '📍',
+            'emoji' => $validated['emoji'] ?? '📍',
         ]);
 
         return redirect()->route('groups.mapMarkers.index', $group->id)->with('success', 'Map marker created successfully.');
