@@ -4,10 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Models\Group;
 use App\Models\MapMarker;
+use App\Services\GeolocationService;
 use Illuminate\Http\Request;
 
 class MapController extends Controller
 {
+    protected GeolocationService $geolocationService;
+
+    public function __construct(GeolocationService $geolocationService)
+    {
+        $this->geolocationService = $geolocationService;
+    }
+
     public function displayMap(Group $group)
     {
         $markers = MapMarker::where('group_id', $group->id)->get();
@@ -35,10 +43,14 @@ class MapController extends Controller
             'name' => 'required|string|max:50',
             'description' => 'nullable|string',
             'address' => 'nullable|string',
-            'lat' => 'nullable|numeric',
-            'lon' => 'nullable|numeric',
             'emoji' => 'nullable|string',
         ]);
+
+        $coordinates = $this->geolocationService->getCoordinates($validated['address']);
+
+        if ($coordinates === null) {
+            return redirect()->back()->with('error', 'Could not find address..');
+        }
 
         $marker = MapMarker::create([
             'group_id' => $group->id,
@@ -46,8 +58,8 @@ class MapController extends Controller
             'name' => $validated['name'],
             'description' => $validated['description'],
             'address' => $validated['address'],
-            'lat' => $validated['lat'],
-            'lon' => $validated['lon'],
+            'lat' => $coordinates['lat'],
+            'lon' => $coordinates['lon'],
             'emoji' => $validated['emoji'] ?? '📍',
         ]);
 
@@ -74,6 +86,17 @@ class MapController extends Controller
             'lon' => 'nullable|numeric',
             'emoji' => 'nullable|string',
         ]);
+
+        if ($validated['address'] !== $mapMarker->address) {
+            $coordinates = $this->geolocationService->getCoordinates($validated['address']);
+
+            if ($coordinates === null) {
+                return redirect()->back()->with('error', 'Could not find address..');
+            }
+
+            $validated['lat'] = $coordinates['lat'];
+            $validated['lon'] = $coordinates['lon'];
+        }
 
         $mapMarker->update([
             'name' => $validated['name'],

@@ -24,6 +24,7 @@
 
             <div class="mb-4">
                 <h2 class="text-xl font-semibold text-gray-800 mb-2 dark:text-white">Location</h2>
+                <p class="text-gray-700 dark:text-gray-300">Address: {{ $mapMarker->address }}</p>
                 <p class="text-gray-700 dark:text-gray-300">
                     Latitude: {{ $mapMarker->lat }}, Longitude: {{ $mapMarker->lon }}
                 </p>
