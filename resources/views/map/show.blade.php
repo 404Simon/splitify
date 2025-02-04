@@ -1,12 +1,5 @@
 <x-app-layout>
     <div class="container mx-auto px-4 py-8">
-        <div class="mb-4">
-            <a href="{{ route('groups.show', $group->id) }}"
-                class="inline-flex items-center px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 text-sm font-medium rounded-md dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white">
-                ← Back to {{ $group->name }}
-            </a>
-        </div>
-
         <div class="bg-white rounded-lg shadow p-6 dark:bg-gray-800">
             <h1 class="text-3xl font-bold text-gray-900 mb-6 dark:text-white">
                 Map Marker: {{ $mapMarker->name }}

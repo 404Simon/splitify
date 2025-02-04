@@ -5,31 +5,15 @@
         </h1>
         <div class="mb-4">
             <div class="inline-flex space-x-4">
-                <a href="{{ route('groups.sharedDebts.create', $group->id) }}"
-                    class="inline-flex items-center px-4 py-2 bg-red-600 hover:bg-red-800 text-white text-sm font-medium rounded-md dark:bg-red-700 dark:hover:bg-red-800">
-                    💰 Add Debt
-                </a>
-                <a href="{{ route('groups.transactions.create', $group->id) }}"
-                    class="inline-flex items-center px-4 py-2 bg-emerald-500 hover:bg-emerald-700 text-white text-sm font-medium rounded-md dark:bg-emerald-600 dark:hover:bg-emerald-700">
-                    💸 Add Transaction
-                </a>
+
                 <a href="{{ route('groups.mapMarkers.index', $group->id) }}"
                     class="inline-flex items-center px-4 py-2 bg-indigo-500 hover:bg-indigo-700 text-white text-sm font-medium rounded-md dark:bg-indigo-600 dark:hover:bg-indigo-700">
                     🗺️ Map
                 </a>
-                @if ($group->created_by === Auth::id())
-                    <a href="{{ route('groups.invites.index', $group->id) }}"
-                        class="inline-flex items-center px-4 py-2 bg-blue-500 hover:bg-blue-700 text-white text-sm font-medium rounded-md dark:bg-blue-600 dark:hover:bg-blue-700">
-                        ✉️ Invites
-                    </a>
-                @endif
+
             </div>
         </div>
 
-        <div class="bg-white rounded-lg shadow p-6 mb-8 dark:bg-gray-800">
-            <h2 class="text-xl font-semibold text-gray-800 mb-4 dark:text-white">Members</h2>
-            <x-user-list-display :users="$group->users" :groupAdminId="$group->created_by" />
-        </div>
 
         <div class="bg-white rounded-lg shadow p-6 mb-8 dark:bg-gray-800">
             <h2 class="text-xl font-semibold text-gray-800 mb-4 dark:text-white">Debts Overview</h2>
@@ -38,24 +22,52 @@
                     <div class="bg-gray-50 p-4 rounded-md shadow dark:bg-gray-700">
                         <h3 class="text-lg font-semibold text-gray-800 mb-2 dark:text-white">{{ $user->name }}</h3>
                         <ul class="space-y-2">
+                            @php
+                                $totalOwed = 0;
+                                $totalOwing = 0;
+                            @endphp
                             @foreach ($userDebts[$user->id] ?? [] as $otherUserId => $amount)
                                 @php
                                     $otherUser = $group->users->find($otherUserId);
                                     $formattedAmount = number_format(abs($amount), 2);
                                 @endphp
                                 @if ($amount > 0)
-                                    <li class="text-green-600 dark:text-green-400">
+                                    <li class="text-red-600 dark:text-red-400">
                                         Owes {{ $otherUser->name }} <span
                                             class="font-semibold">€{{ $formattedAmount }}</span>
                                     </li>
+                                    @php $totalOwing += $amount; @endphp
                                 @elseif($amount < 0)
-                                    <li class="text-red-600 dark:text-red-400">
+                                    <li class="text-green-600 dark:text-green-400">
                                         Is owed by {{ $otherUser->name }} <span
                                             class="font-semibold">€{{ $formattedAmount }}</span>
                                     </li>
+                                    @php $totalOwed -= $amount; @endphp
                                 @endif
                             @endforeach
                         </ul>
+
+                        <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600">
+                            <p class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                Total Owed: <span class="{{ $totalOwed > 0 ? 'text-green-600 dark:text-green-400' : 'text-gray-600 dark:text-gray-400' }}">€{{ number_format($totalOwed, 2) }}</span>
+                            </p>
+                            <p class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                Total Owing: <span class="{{ $totalOwing > 0 ? 'text-red-600 dark:text-red-400' : 'text-gray-600 dark:text-gray-400' }}">€{{ number_format($totalOwing, 2) }}</span>
+                            </p>
+                            @if($totalOwed > $totalOwing)
+                                <p class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    Net Balance: <span class="text-green-600 dark:text-green-400">€{{ number_format($totalOwed - $totalOwing, 2) }}</span>
+                                </p>
+                            @elseif($totalOwing > $totalOwed)
+                                <p class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    Net Balance: <span class="text-red-600 dark:text-red-400">€{{ number_format($totalOwing - $totalOwed, 2) }}</span>
+                                </p>
+                            @else
+                                <p class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    Net Balance: <span class="text-gray-600 dark:text-gray-400">€0.00</span>
+                                </p>
+                            @endif
+                        </div>
                     </div>
                 @endforeach
             </div>
@@ -63,7 +75,15 @@
 
 
         <div class="bg-white rounded-lg shadow p-6 mb-8 dark:bg-gray-800">
-            <h2 class="text-xl font-semibold text-gray-800 mb-4 dark:text-white">Shared Debts</h2>
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Shared Debts</h2>
+                <a href="{{ route('groups.sharedDebts.create', $group->id) }}"
+                    class="inline-flex items-center justify-center p-2 bg-red-600 hover:bg-red-800 text-white text-sm font-medium rounded-full dark:bg-red-700 dark:hover:bg-red-800 w-8 h-8">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                    </svg>
+                </a>
+            </div>
             <ul class="divide-y divide-gray-200 dark:divide-gray-700">
                 @forelse($group->sharedDebts as $debt)
                     <li class="py-4">
@@ -117,7 +137,15 @@
 
 
         <div class="bg-white rounded-lg shadow p-6 mb-8 dark:bg-gray-800">
-            <h2 class="text-xl font-semibold text-gray-800 mb-4 dark:text-white">Transactions</h2>
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Transactions</h2>
+                <a href="{{ route('groups.transactions.create', $group->id) }}"
+                    class="inline-flex items-center justify-center p-2 bg-emerald-500 hover:bg-emerald-700 text-white text-sm font-medium rounded-full dark:bg-emerald-600 dark:hover:bg-emerald-700 w-8 h-8">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                    </svg>
+                </a>
+            </div>
             <ul class="divide-y divide-gray-200 dark:divide-gray-700">
                 @forelse($group->transactions as $transaction)
                     <li class="py-4">
@@ -163,6 +191,20 @@
                     <li class="px-6 py-4 text-gray-500 dark:text-gray-400">No transactions yet.</li>
                 @endforelse
             </ul>
+        </div>
+                <div class="bg-white rounded-lg shadow p-6 mb-8 dark:bg-gray-800">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Members</h2>
+                 @if ($group->created_by === Auth::id())
+                    <a href="{{ route('groups.invites.index', $group->id) }}"
+                        class="inline-flex items-center justify-center p-2 bg-blue-500 hover:bg-blue-700 text-white text-sm font-medium rounded-full dark:bg-blue-600 dark:hover:bg-blue-700 w-8 h-8">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                        </svg>
+                    </a>
+                 @endif
+            </div>
+            <x-user-list-display :users="$group->users" :groupAdminId="$group->created_by" />
         </div>
 
     </div>
