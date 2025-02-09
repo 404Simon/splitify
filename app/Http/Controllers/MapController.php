@@ -42,7 +42,7 @@ class MapController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:50',
             'description' => 'nullable|string',
-            'address' => 'nullable|string',
+            'address' => 'required|string',
             'emoji' => 'nullable|string',
         ]);
 
@@ -56,7 +56,7 @@ class MapController extends Controller
             'group_id' => $group->id,
             'created_by' => auth()->id(),
             'name' => $validated['name'],
-            'description' => $validated['description'],
+            'description' => $validated['description'] ?? '',
             'address' => $validated['address'],
             'lat' => $coordinates['lat'],
             'lon' => $coordinates['lon'],
@@ -81,7 +81,7 @@ class MapController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:50',
             'description' => 'nullable|string',
-            'address' => 'nullable|string',
+            'address' => 'required|string',
             'lat' => 'nullable|numeric',
             'lon' => 'nullable|numeric',
             'emoji' => 'nullable|string',
