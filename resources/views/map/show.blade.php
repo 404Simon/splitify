@@ -12,7 +12,8 @@
 
             <div class="mb-4">
                 <h2 class="text-xl font-semibold text-gray-800 mb-2 dark:text-white">Description</h2>
-                <p class="text-gray-700 dark:text-gray-300">{{ $mapMarker->description ?? 'No description provided.' }}</p>
+                <p class="text-gray-700 dark:text-gray-300">{{ $mapMarker->description ?? 'No description provided.' }}
+                </p>
             </div>
 
             <div class="mb-4">
@@ -28,7 +29,7 @@
                 <p class="text-gray-700 dark:text-gray-300">{{ $mapMarker->created_at->format('F j, Y, g:i a') }}</p>
             </div>
 
-             <div class="mb-4">
+            <div class="mb-4">
                 <h2 class="text-xl font-semibold text-gray-800 mb-2 dark:text-white">Updated At</h2>
                 <p class="text-gray-700 dark:text-gray-300">{{ $mapMarker->updated_at->format('F j, Y, g:i a') }}</p>
             </div>
