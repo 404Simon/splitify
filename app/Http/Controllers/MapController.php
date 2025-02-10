@@ -41,9 +41,9 @@ class MapController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:50',
-            'description' => 'nullable|string',
-            'address' => 'required|string',
-            'emoji' => 'nullable|string',
+            'description' => 'nullable|string|max:256',
+            'address' => 'required|string|max:128',
+            'emoji' => 'nullable|string|max:1',
         ]);
 
         $coordinates = $this->geolocationService->getCoordinates($validated['address']);
@@ -80,11 +80,11 @@ class MapController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:50',
-            'description' => 'nullable|string',
-            'address' => 'required|string',
+            'description' => 'nullable|string|max:256',
+            'address' => 'required|string|max:128',
             'lat' => 'nullable|numeric',
             'lon' => 'nullable|numeric',
-            'emoji' => 'nullable|string',
+            'emoji' => 'nullable|string|max:1',
         ]);
 
         if ($validated['address'] !== $mapMarker->address) {
