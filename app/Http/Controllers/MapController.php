@@ -6,6 +6,7 @@ use App\Models\Group;
 use App\Models\MapMarker;
 use App\Services\GeolocationService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class MapController extends Controller
 {
@@ -43,7 +44,7 @@ class MapController extends Controller
             'name' => 'required|string|max:50',
             'description' => 'nullable|string|max:256',
             'address' => 'required|string|max:128',
-            'emoji' => 'nullable|string|max:1',
+            'emoji' => 'nullable|string|max:4',
         ]);
 
         $coordinates = $this->geolocationService->getCoordinates($validated['address']);
@@ -84,7 +85,7 @@ class MapController extends Controller
             'address' => 'required|string|max:128',
             'lat' => 'nullable|numeric',
             'lon' => 'nullable|numeric',
-            'emoji' => 'nullable|string|max:1',
+            'emoji' => 'nullable|string|max:4',
         ]);
 
         if ($validated['address'] !== $mapMarker->address) {
