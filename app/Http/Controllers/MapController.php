@@ -102,7 +102,7 @@ class MapController extends Controller
 
         $mapMarker->update([
             'name' => $validated['name'],
-            'description' => $validated['description'],
+            'description' => $validated['description'] ?? '',
             'address' => $validated['address'],
             'lat' => $validated['lat'],
             'lon' => $validated['lon'],
