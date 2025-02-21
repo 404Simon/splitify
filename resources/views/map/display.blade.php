@@ -130,7 +130,7 @@
     const map = new maplibregl.Map({
       container: 'map',
       style: currentStyle,
-      center: [4.9041, 52.3676], // Center on Amsterdam
+      center: [{{ $center["lon"] }}, {{ $center["lat"] }}],
       zoom: 7
     });
     map.addControl(new maplibregl.NavigationControl());

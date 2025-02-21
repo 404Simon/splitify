@@ -20,7 +20,8 @@ class MapController extends Controller
     public function displayMap(Group $group)
     {
         $markers = MapMarker::where('group_id', $group->id)->get();
-        return view('map.display', compact('group', 'markers'));
+        $center = ['lat' => $markers->avg('lat'), 'lon' => $markers->avg('lon')];
+        return view('map.display', compact('group', 'markers', 'center'));
     }
 
     public function index(Group $group)
