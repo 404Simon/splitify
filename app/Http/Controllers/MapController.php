@@ -6,7 +6,6 @@ use App\Models\Group;
 use App\Models\MapMarker;
 use App\Services\GeolocationService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 
 class MapController extends Controller
 {
@@ -20,7 +19,13 @@ class MapController extends Controller
     public function displayMap(Group $group)
     {
         $markers = MapMarker::where('group_id', $group->id)->get();
-        $center = ['lat' => $markers->avg('lat'), 'lon' => $markers->avg('lon')];
+
+        if ($markers->isEmpty()) {
+            $center = ['lat' => 49.445, 'lon' => 11.173];
+        } else {
+            $center = ['lat' => $markers->avg('lat'), 'lon' => $markers->avg('lon')];
+        }
+
         return view('map.display', compact('group', 'markers', 'center'));
     }
 
