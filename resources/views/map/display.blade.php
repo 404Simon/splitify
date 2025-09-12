@@ -58,6 +58,19 @@
     .maplibregl-popup-close-button {
       color: #777;
       font-size: 1.2rem;
+      padding: 5px 8px;
+      cursor: pointer;
+      background: transparent;
+      border: none;
+      position: absolute;
+      top: 0;
+      right: 0;
+      z-index: 2;
+    }
+
+    .maplibregl-popup-close-button:hover {
+      color: #333;
+      background-color: rgba(0,0,0,0.05);
     }
 
     /* Dark mode popup styles */
@@ -69,6 +82,11 @@
 
     .dark-mode .maplibregl-popup-close-button {
       color: #A0AEC0;
+    }
+
+    .dark-mode .maplibregl-popup-close-button:hover {
+      color: #ffffff;
+      background-color: rgba(255,255,255,0.1);
     }
 
     /* Custom map marker styles */
@@ -156,6 +174,14 @@
         })
     );
 
+    // Close popup when clicking elsewhere on the map
+    map.on('click', () => {
+        if (currentOpenPopup) {
+            currentOpenPopup.remove();
+            currentOpenPopup = null;
+        }
+    });
+
     const cityData = {
     @foreach($markers as $marker)
       "{{ $marker->name }}": {
@@ -167,6 +193,8 @@
     @endforeach
     };
 
+    let currentOpenPopup = null;
+
     // Create markers and store them.
     const markers = {};
     for (const city in cityData) {
@@ -177,14 +205,61 @@
       markerElement.className = 'map-marker';
       markerElement.textContent = cityInfo.markerIcon;
 
-      markers[city] = new maplibregl.Marker({ element: markerElement })
+      const popup = new maplibregl.Popup({
+        offset: 25,
+        closeButton: true,
+        closeOnClick: false
+      }).setHTML(`
+        <h3>${city}</h3>
+        <p>${cityInfo.description}</p>
+        ${cityInfo.address ? `<p><a class="address" href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(cityInfo.address)}" target="_blank" rel="noopener">Get Directions</a></p>` : ''}
+      `);
+
+      popup.on('open', () => {
+        if (currentOpenPopup && currentOpenPopup !== popup) {
+          currentOpenPopup.remove();
+        }
+        currentOpenPopup = popup;
+
+        setTimeout(() => {
+          const popupContent = document.querySelector('.maplibregl-popup-content');
+          if (popupContent) {
+            popupContent.addEventListener('click', (e) => {
+              e.stopPropagation(); // Prevent map click from closing popup
+            });
+          }
+
+          const closeButton = document.querySelector('.maplibregl-popup-close-button');
+          if (closeButton) {
+            closeButton.addEventListener('click', (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              popup.remove();
+              currentOpenPopup = null;
+            });
+          }
+        }, 100);
+      });
+
+      popup.on('close', () => {
+        if (currentOpenPopup === popup) {
+          currentOpenPopup = null;
+        }
+      });
+
+      const marker = new maplibregl.Marker({ element: markerElement })
         .setLngLat(cityInfo.coords)
-        .setPopup(new maplibregl.Popup({ offset: 25 }).setHTML(`
-          <h3>${city}</h3>
-          <p>${cityInfo.description}</p>
-          ${cityInfo.address ? `<p><a class="address" href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(cityInfo.address)}" target="_blank" rel="noopener">Get Directions</a></p>` : ''}
-        `))
-        .addTo(map);
+        .setPopup(popup);
+
+      markerElement.addEventListener('click', () => {
+        if (currentOpenPopup && currentOpenPopup !== popup) {
+          currentOpenPopup.remove();
+          currentOpenPopup = null;
+        }
+      });
+
+      marker.addTo(map);
+      markers[city] = marker;
     }
 
     function updateMarkers() {
@@ -195,6 +270,11 @@
             markers[city].addTo(map);
           }
         } else {
+          const markerPopup = markers[city].getPopup();
+          if (markerPopup === currentOpenPopup) {
+            currentOpenPopup.remove();
+            currentOpenPopup = null;
+          }
           markers[city].remove();
         }
       });
@@ -227,6 +307,12 @@
     });
 
     function updateMapStyle(isDarkMode) {
+      // Close any open popup before changing style
+      if (currentOpenPopup) {
+        currentOpenPopup.remove();
+        currentOpenPopup = null;
+      }
+
       currentStyle = isDarkMode ? 'https://tiles.versatiles.org/assets/styles/eclipse/style.json' : colorfulStyle;
       map.setStyle(currentStyle);
       map.on('styledata', updateMarkers);
