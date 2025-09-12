@@ -128,6 +128,13 @@
     <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5m-16.5 5.25h16.5" />
   </svg></button>
 
+  <!-- Back button -->
+  <a href="javascript:history.back()" class="fixed bottom-12 right-4 bg-white p-2 rounded shadow z-40 hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white" title="Go back">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+    </svg>
+  </a>
+
   <script>
     let currentStyle = 'https://tiles.versatiles.org/assets/styles/eclipse/style.json';
     const colorfulStyle = 'https://tiles.versatiles.org/assets/styles/colorful/style.json';
