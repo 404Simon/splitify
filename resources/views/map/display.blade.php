@@ -319,20 +319,27 @@
     }
 
     document.addEventListener('alpine:init', () => {
-        Alpine.effect(() => {
-            updateMapStyle(Alpine.store('darkMode').darkMode);
-        })
-    })
-
-    document.addEventListener('DOMContentLoaded', () => {
         Alpine.store('darkMode', { darkMode: true });
         Alpine.store('sidebarOpen', { sidebarOpen: false });
-        updateMapStyle(Alpine.store('darkMode').darkMode);
+
+        Alpine.effect(() => {
+            if (Alpine.store('darkMode')) {
+                updateMapStyle(Alpine.store('darkMode').darkMode);
+            }
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        if (Alpine.store('darkMode')) {
+            updateMapStyle(Alpine.store('darkMode').darkMode);
+        }
     });
 
      document.getElementById('toggle-darkmode').addEventListener('change', function() {
-        Alpine.store('darkMode').darkMode = this.checked;
-        updateMapStyle(this.checked);
+        if (Alpine.store('darkMode')) {
+            Alpine.store('darkMode').darkMode = this.checked;
+            updateMapStyle(this.checked);
+        }
      });
   </script>
 </body>
