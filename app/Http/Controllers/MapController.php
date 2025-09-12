@@ -6,6 +6,7 @@ use App\Models\Group;
 use App\Models\MapMarker;
 use App\Services\GeolocationService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class MapController extends Controller
 {
@@ -75,6 +76,8 @@ class MapController extends Controller
 
     public function edit(Group $group, MapMarker $mapMarker)
     {
+        Gate::authorize('update', $mapMarker);
+
         return view('map.edit', compact('group', 'mapMarker'));
     }
 
@@ -85,6 +88,8 @@ class MapController extends Controller
 
     public function update(Request $request, Group $group, MapMarker $mapMarker)
     {
+        Gate::authorize('update', $mapMarker);
+
         $validated = $request->validate([
             'name' => 'required|string|max:50',
             'description' => 'nullable|string|max:256',
@@ -119,9 +124,7 @@ class MapController extends Controller
 
     public function destroy(Group $group, MapMarker $mapMarker)
     {
-        if ($mapMarker->created_by !== auth()->id()) {
-            return redirect()->route('groups.mapMarkers.index', $group->id)->with('error', 'You are not authorized to delete this map marker.');
-        }
+        Gate::authorize('delete', $mapMarker);
 
         $mapMarker->delete();
 

@@ -34,11 +34,13 @@
                 <p class="text-gray-700 dark:text-gray-300">{{ $mapMarker->updated_at->format('F j, Y, g:i a') }}</p>
             </div>
 
+            @can('update', $mapMarker)
             <div class="mt-6 border-t border-gray-200 dark:border-gray-700 pt-4">
                 <a href="{{ route('groups.mapMarkers.edit', [$group->id, $mapMarker->id]) }}"
                     class="inline-flex items-center px-4 py-2 bg-blue-500 hover:bg-blue-700 text-white text-sm font-medium rounded-md dark:bg-blue-600 dark:hover:bg-blue-700">
                     Edit Map Marker
                 </a>
+                @endcan
             </div>
         </div>
     </div>
