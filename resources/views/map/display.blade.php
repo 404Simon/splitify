@@ -11,6 +11,11 @@
   <link href="https://tiles.versatiles.org/assets/lib/maplibre-gl/maplibre-gl.css" rel="stylesheet" />
   <!-- Alpine.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="/favicon-192x192.png">
+  <link rel="icon" sizes="192x192" href="/favicon-192x192.png">
   <style>
     /* Modern popup styles */
     .maplibregl-popup-content {
