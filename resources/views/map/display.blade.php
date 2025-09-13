@@ -16,6 +16,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="apple-touch-icon" href="/favicon-192x192.png">
   <link rel="icon" sizes="192x192" href="/favicon-192x192.png">
+  <meta name="color-scheme" content="light dark">
   <style>
     /* Modern popup styles */
     .maplibregl-popup-content {
