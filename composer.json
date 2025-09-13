@@ -1,8 +1,8 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/laravel",
+    "name": "404simon/splitify",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
+    "description": "Share your bills with friends.",
     "keywords": [
         "laravel",
         "framework"
@@ -10,7 +10,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
-        "laravel/framework": "^11.31",
+        "laravel/framework": "^12.0",
         "laravel/tinker": "^2.9",
         "silviolleite/laravelpwa": "^2.0"
     },
