@@ -143,12 +143,12 @@
     <div id="map" class="flex-1 relative"></div>
   </div>
   <!-- Hamburger menu button for mobile -->
-  <button id="menu-button" class="fixed top-4 left-4 bg-white p-2 rounded shadow z-40 md:hidden hover:bg-gray-100" @click="sidebarOpen = !sidebarOpen"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5m-16.5 5.25h16.5" />
+  <button id="menu-button" class="fixed top-4 left-4 bg-white p-2 rounded shadow z-40 md:hidden hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white flex items-center justify-center" @click="sidebarOpen = !sidebarOpen"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 7.5h16.5M3.75 12h16.5m-16.5 4.5h16.5" />
   </svg></button>
 
   <!-- Back button -->
-  <a href="javascript:history.back()" class="fixed bottom-12 right-4 bg-white p-2 rounded shadow z-40 hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white" title="Go back">
+  <a href="javascript:history.back()" class="fixed bottom-12 right-4 bg-white p-2 rounded shadow z-40 hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white flex items-center justify-center" title="Go back">
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
       <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
     </svg>
