@@ -14,8 +14,12 @@
                 step="any" />
             <x-input-with-label label="Longitude" name="lon" value="{{ old('lon', $mapMarker->lon) }}"
                 type="number" step="any" />
-            <x-input-with-label label="Emoji" name="emoji" value="{{ old('emoji', $mapMarker->emoji) }}"
-                type="text" />
+            <div>
+                <x-input-label for="emoji" :value="__('Emoji')" />
+                <div class="mt-1">
+                    <x-emoji-selector name="emoji" :value="old('emoji', $mapMarker->emoji)" />
+                </div>
+            </div>
 
             <x-button>Update Map Marker</x-button>
         </form>
