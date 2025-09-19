@@ -5,6 +5,10 @@
         </h1>
         <div class="mb-4">
             <div class="inline-flex space-x-4">
+                <a href="{{ route('groups.recurring-debts.index', $group) }}"
+                    class="inline-flex items-center px-4 py-2 bg-purple-500 hover:bg-purple-700 text-white text-sm font-medium rounded-md dark:bg-purple-600 dark:hover:bg-purple-700">
+                    🔄 Recurring Debts
+                </a>
 
                 <a href="{{ route('groups.mapMarkers.index', $group->id) }}"
                     class="inline-flex items-center px-4 py-2 bg-indigo-500 hover:bg-indigo-700 text-white text-sm font-medium rounded-md dark:bg-indigo-600 dark:hover:bg-indigo-700">
@@ -49,18 +53,22 @@
 
                         <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600">
                             <p class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                Total Owed: <span class="{{ $totalOwed > 0 ? 'text-green-600 dark:text-green-400' : 'text-gray-600 dark:text-gray-400' }}">€{{ number_format($totalOwed, 2) }}</span>
+                                Total Owed: <span
+                                    class="{{ $totalOwed > 0 ? 'text-green-600 dark:text-green-400' : 'text-gray-600 dark:text-gray-400' }}">€{{ number_format($totalOwed, 2) }}</span>
                             </p>
                             <p class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                Total Owing: <span class="{{ $totalOwing > 0 ? 'text-red-600 dark:text-red-400' : 'text-gray-600 dark:text-gray-400' }}">€{{ number_format($totalOwing, 2) }}</span>
+                                Total Owing: <span
+                                    class="{{ $totalOwing > 0 ? 'text-red-600 dark:text-red-400' : 'text-gray-600 dark:text-gray-400' }}">€{{ number_format($totalOwing, 2) }}</span>
                             </p>
-                            @if($totalOwed > $totalOwing)
+                            @if ($totalOwed > $totalOwing)
                                 <p class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                    Net Balance: <span class="text-green-600 dark:text-green-400">€{{ number_format($totalOwed - $totalOwing, 2) }}</span>
+                                    Net Balance: <span
+                                        class="text-green-600 dark:text-green-400">€{{ number_format($totalOwed - $totalOwing, 2) }}</span>
                                 </p>
                             @elseif($totalOwing > $totalOwed)
                                 <p class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                    Net Balance: <span class="text-red-600 dark:text-red-400">€{{ number_format($totalOwing - $totalOwed, 2) }}</span>
+                                    Net Balance: <span
+                                        class="text-red-600 dark:text-red-400">€{{ number_format($totalOwing - $totalOwed, 2) }}</span>
                                 </p>
                             @else
                                 <p class="text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -73,6 +81,59 @@
             </div>
         </div>
 
+        @if ($group->recurringSharedDebts->where('is_active', true)->isNotEmpty())
+            <div class="bg-white rounded-lg shadow p-6 mb-8 dark:bg-gray-800">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Active Recurring Debts</h2>
+                    <a href="{{ route('groups.recurring-debts.index', $group) }}"
+                        class="text-purple-600 hover:text-purple-800 text-sm font-medium dark:text-purple-400 dark:hover:text-purple-300">
+                        View All →
+                    </a>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    @foreach ($group->recurringSharedDebts->where('is_active', true)->take(3) as $recurringDebt)
+                        <a href="{{ route('groups.recurring-debts.show', [$group, $recurringDebt]) }}"
+                            class="block bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg border border-purple-200 dark:border-purple-800 hover:bg-purple-100 dark:hover:bg-purple-900/30 transition-colors duration-200">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="font-semibold text-gray-900 dark:text-white text-sm">
+                                    {{ $recurringDebt->name }}</h3>
+                                <span
+                                    class="text-xs bg-purple-100 dark:bg-purple-900/40 text-purple-800 dark:text-purple-300 px-2 py-1 rounded-full">
+                                    {{ $recurringDebt->frequency_label }}
+                                </span>
+                            </div>
+                            <p class="text-lg font-bold text-purple-600 dark:text-purple-400 mb-2">
+                                €{{ number_format($recurringDebt->amount, 2) }}</p>
+                            <p class="text-xs text-gray-600 dark:text-gray-400">
+                                Next: {{ $recurringDebt->next_generation_date->format('M j') }}
+                            </p>
+                            <div class="mt-2 flex flex-wrap gap-1">
+                                @foreach ($recurringDebt->users->take(3) as $user)
+                                    <span
+                                        class="inline-block w-6 h-6 bg-purple-200 dark:bg-purple-700 rounded-full text-xs flex items-center justify-center text-purple-800 dark:text-purple-200">
+                                        {{ substr($user->name, 0, 1) }}
+                                    </span>
+                                @endforeach
+                                @if ($recurringDebt->users->count() > 3)
+                                    <span
+                                        class="text-xs text-gray-500 dark:text-gray-400 ml-1">+{{ $recurringDebt->users->count() - 3 }}</span>
+                                @endif
+                            </div>
+                        </a>
+                    @endforeach
+                </div>
+                @if ($group->recurringSharedDebts->where('is_active', true)->count() > 3)
+                    <div class="mt-4 text-center">
+                        <a href="{{ route('groups.recurring-debts.index', $group) }}"
+                            class="text-sm text-purple-600 hover:text-purple-800 dark:text-purple-400 dark:hover:text-purple-300">
+                            View {{ $group->recurringSharedDebts->where('is_active', true)->count() - 3 }} more
+                            recurring debts
+                        </a>
+                    </div>
+                @endif
+            </div>
+        @endif
+
 
         <div class="bg-white rounded-lg shadow p-6 mb-8 dark:bg-gray-800">
             <div class="flex justify-between items-center mb-4">
@@ -80,7 +141,9 @@
                 <a href="{{ route('groups.sharedDebts.create', $group->id) }}"
                     class="inline-flex items-center justify-center p-2 bg-red-600 hover:bg-red-800 text-white text-sm font-medium rounded-full dark:bg-red-700 dark:hover:bg-red-800 w-8 h-8">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                        <path fill-rule="evenodd"
+                            d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+                            clip-rule="evenodd" />
                     </svg>
                 </a>
             </div>
@@ -101,11 +164,16 @@
                                 @if ($debt->created_by === Auth::id())
                                     <a href="{{ route('groups.sharedDebts.edit', ['group' => $group->id, 'sharedDebt' => $debt->id]) }}"
                                         class="text-blue-500 hover:text-blue-700 focus:outline-none dark:text-blue-400 dark:hover:text-blue-500">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 inline-block align-middle">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125" />
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                            stroke-width="2" stroke="currentColor"
+                                            class="w-4 h-4 inline-block align-middle">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125" />
                                         </svg>
                                     </a>
-                                    <form action="{{ route('groups.sharedDebts.destroy', ['group' => $group->id, 'sharedDebt' => $debt->id]) }}" method="POST">
+                                    <form
+                                        action="{{ route('groups.sharedDebts.destroy', ['group' => $group->id, 'sharedDebt' => $debt->id]) }}"
+                                        method="POST">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit"
@@ -142,7 +210,9 @@
                 <a href="{{ route('groups.transactions.create', $group->id) }}"
                     class="inline-flex items-center justify-center p-2 bg-emerald-500 hover:bg-emerald-700 text-white text-sm font-medium rounded-full dark:bg-emerald-600 dark:hover:bg-emerald-700 w-8 h-8">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                        <path fill-rule="evenodd"
+                            d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+                            clip-rule="evenodd" />
                     </svg>
                 </a>
             </div>
@@ -166,18 +236,23 @@
                                 @if ($transaction->payer_id === Auth::id())
                                     <a href="{{ route('groups.transactions.edit', ['group' => $group->id, 'transaction' => $transaction->id]) }}"
                                         class="text-blue-500 hover:text-blue-700 focus:outline-none dark:text-blue-400 dark:hover:text-blue-500">
-                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 inline-block align-middle">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125" />
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                            stroke-width="2" stroke="currentColor"
+                                            class="w-4 h-4 inline-block align-middle">
+                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125" />
                                         </svg>
                                     </a>
-                                    <form action="{{ route('groups.transactions.destroy', ['group' => $group->id, 'transaction' => $transaction->id]) }}" method="POST">
+                                    <form
+                                        action="{{ route('groups.transactions.destroy', ['group' => $group->id, 'transaction' => $transaction->id]) }}"
+                                        method="POST">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit"
                                             class="text-red-500 hover:text-red-700 ml-2 focus:outline-none dark:text-red-400 dark:hover:text-red-500">
                                             <svg xmlns="http://www.w3.org/2000/svg"
-                                                class="h-4 w-4 inline-block align-middle" fill="none" viewBox="0 0 24 24"
-                                                stroke="currentColor" stroke-width="2">
+                                                class="h-4 w-4 inline-block align-middle" fill="none"
+                                                viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                 <path stroke-linecap="round" stroke-linejoin="round"
                                                     d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                             </svg>
@@ -192,17 +267,20 @@
                 @endforelse
             </ul>
         </div>
-                <div class="bg-white rounded-lg shadow p-6 mb-8 dark:bg-gray-800">
+        <div class="bg-white rounded-lg shadow p-6 mb-8 dark:bg-gray-800">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-xl font-semibold text-gray-800 dark:text-white">Members</h2>
-                 @if ($group->created_by === Auth::id())
+                @if ($group->created_by === Auth::id())
                     <a href="{{ route('groups.invites.index', $group->id) }}"
                         class="inline-flex items-center justify-center p-2 bg-blue-500 hover:bg-blue-700 text-white text-sm font-medium rounded-full dark:bg-blue-600 dark:hover:bg-blue-700 w-8 h-8">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
+                            fill="currentColor">
+                            <path fill-rule="evenodd"
+                                d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+                                clip-rule="evenodd" />
                         </svg>
                     </a>
-                 @endif
+                @endif
             </div>
             <x-user-list-display :users="$group->users" :groupAdminId="$group->created_by" />
         </div>

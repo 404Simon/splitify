@@ -4,6 +4,7 @@ use App\Http\Controllers\GroupController;
 use App\Http\Controllers\InviteController;
 use App\Http\Controllers\MapController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RecurringSharedDebtController;
 use App\Http\Controllers\SharedDebtController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Middleware\EnsureIsGroupAdmin;
@@ -31,9 +32,14 @@ Route::middleware('auth')->group(function () {
         Route::resource('sharedDebts', SharedDebtController::class);
         Route::resource('transactions', TransactionController::class);
         Route::resource('mapMarkers', MapController::class);
+
+        Route::resource('recurring-debts', RecurringSharedDebtController::class);
+        Route::patch('recurring-debts/{recurringDebt}/toggle-active', [RecurringSharedDebtController::class, 'toggleActive'])->name('recurring-debts.toggle-active');
+        Route::post('recurring-debts/{recurringDebt}/generate-now', [RecurringSharedDebtController::class, 'generateNow'])->name('recurring-debts.generate-now');
+
         // Route::post('/generate-invite', [GroupController::class, 'generateInvite'])->name('groups.generateInvite');
         Route::get('map', [MapController::class, 'displayMap'])->name('map.display');
     });
 });
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';

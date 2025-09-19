@@ -31,6 +31,7 @@ class GroupController extends Controller
     public function create()
     {
         $users = User::where('id', '!=', auth()->id())->get();
+
         return view('groups.create', compact('users'));
     }
 
@@ -58,10 +59,19 @@ class GroupController extends Controller
      */
     public function show(Group $group)
     {
-        $group = Group::with(['users', 'sharedDebts', 'transactions' => function ($query) {
-            $query->with(['payer', 'recipient']);  // Eager load payer and recipient
-        }])->findOrFail($group->id);
+        $group = Group::with([
+            'users',
+            'sharedDebts',
+            'recurringSharedDebts' => function ($query) {
+                $query->with(['users']);
+            },
+            'transactions' => function ($query) {
+                $query->with(['payer', 'recipient']);
+            },
+        ])->findOrFail($group->id);
+
         $userDebts = $group->calculateUserDebts();
+
         return view('groups.show', compact('group', 'userDebts'));
     }
 
@@ -87,7 +97,7 @@ class GroupController extends Controller
             'members' => 'array|exists:users,id',
         ]);
 
-        if (!collect($validated['members'])->contains(auth()->id())) {
+        if (! collect($validated['members'])->contains(auth()->id())) {
             return redirect()->back()->with('error', 'You cannot remove yourself from the group!');
         }
 
@@ -106,6 +116,7 @@ class GroupController extends Controller
     {
         Gate::authorize('delete', $group);
         $group->delete();
+
         return redirect()->route('groups.index')->with('success', 'Group deleted successfully!');
     }
 }

@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Model;
 
 class Group extends Model
 {
@@ -30,6 +30,11 @@ class Group extends Model
         return $this->hasMany(Invite::class);
     }
 
+    public function recurringSharedDebts(): HasMany
+    {
+        return $this->hasMany(RecurringSharedDebt::class);
+    }
+
     public function calculateUserDebts()
     {
         $debts = [];
@@ -40,15 +45,16 @@ class Group extends Model
             $individualDebts = $debt->calculateIndividualDebts();
 
             foreach ($individualDebts as $userId => $amount) {
-                if ($userId == $creatorId)
+                if ($userId == $creatorId) {
                     continue;
+                }
 
-                if (!isset($debts[$userId][$creatorId])) {
+                if (! isset($debts[$userId][$creatorId])) {
                     $debts[$userId][$creatorId] = 0;
                 }
                 $debts[$userId][$creatorId] += $amount;
 
-                if (!isset($debts[$creatorId][$userId])) {
+                if (! isset($debts[$creatorId][$userId])) {
                     $debts[$creatorId][$userId] = 0;
                 }
                 $debts[$creatorId][$userId] -= $amount;
@@ -61,12 +67,12 @@ class Group extends Model
             $recipientId = $transaction->recipient_id;
             $amount = $transaction->amount;
 
-            if (!isset($debts[$recipientId][$payerId])) {
+            if (! isset($debts[$recipientId][$payerId])) {
                 $debts[$recipientId][$payerId] = 0;
             }
             $debts[$recipientId][$payerId] += $amount;  // Recipient effectively owes less to payer
 
-            if (!isset($debts[$payerId][$recipientId])) {
+            if (! isset($debts[$payerId][$recipientId])) {
                 $debts[$payerId][$recipientId] = 0;
             }
             $debts[$payerId][$recipientId] -= $amount;  // Payer owes less to recipient

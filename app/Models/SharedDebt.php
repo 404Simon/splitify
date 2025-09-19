@@ -2,13 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Model;
 
 class SharedDebt extends Model
 {
-    protected $fillable = ['group_id', 'created_by', 'name', 'amount'];
+    protected $fillable = ['group_id', 'created_by', 'name', 'amount', 'recurring_shared_debt_id'];
 
     public function group(): BelongsTo
     {
@@ -23,6 +23,11 @@ class SharedDebt extends Model
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class);
+    }
+
+    public function recurringSharedDebt(): BelongsTo
+    {
+        return $this->belongsTo(RecurringSharedDebt::class);
     }
 
     public function getUserShares()
