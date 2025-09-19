@@ -4,119 +4,210 @@ namespace App\Http\Controllers;
 
 use App\Models\Group;
 use App\Models\User;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Collection;
 use Illuminate\View\View;
 
 class GroupController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Request $request): View
     {
-        // Get the authenticated user
-        $user = auth()->user();
+        $groups = $request->user()->groups()->get();
 
-        // Retrieve all groups the user belongs to
-        $groups = $user->groups()->with('users')->get();
-
-        // Pass the groups to the view
         return view('groups.index', compact('groups'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function create(Request $request): View
     {
-        $users = User::where('id', '!=', auth()->id())->get();
+        $users = User::query()->where('id', '!=', $request->user()->id)->get();
 
         return view('groups.create', compact('users'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
         ]);
 
-        $group = Group::create([
+        $group = Group::query()->create([
             'name' => $validated['name'],
-            'created_by' => auth()->id(),
+            'created_by' => $request->user()->id,
         ]);
 
-        $group->users()->attach(auth()->id());
+        $group->users()->attach($request->user()->id);
 
-        return redirect()->route('groups.index')->with('success', 'Group created successfully!');
+        return redirect()
+            ->route('groups.index')
+            ->with('success', 'Group created successfully!');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Group $group)
+    public function show(Group $group): View
     {
-        $group = Group::with([
-            'users',
-            'sharedDebts',
-            'recurringSharedDebts' => function ($query) {
-                $query->with(['users']);
-            },
-            'transactions' => function ($query) {
-                $query->with(['payer', 'recipient']);
-            },
-        ])->findOrFail($group->id);
+        $this->authorize('view', $group);
 
-        $userDebts = $group->calculateUserDebts();
+        $userDebts = collect($group->calculateUserDebts())
+            ->mapWithKeys(fn ($debts, $userId) => [
+                (string) $userId => collect($debts)->mapWithKeys(fn ($amount, $otherUserId) => [
+                    (string) $otherUserId => $amount,
+                ]),
+            ]);
 
-        return view('groups.show', compact('group', 'userDebts'));
+        $userBalances = $this->calculateUserBalances($group, $userDebts);
+
+        $recentSharedDebts = $this->getRecentSharedDebts($group);
+        $recentTransactions = $this->getRecentTransactions($group);
+        $activeRecurringDebts = $this->getActiveRecurringDebts($group);
+
+        return view('groups.show', compact(
+            'group',
+            'userDebts',
+            'userBalances',
+            'recentSharedDebts',
+            'recentTransactions',
+            'activeRecurringDebts'
+        ));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Group $group)
+    public function edit(Group $group): View
     {
-        Gate::authorize('update', $group);
+        $this->authorize('update', $group);
+
         $users = User::all();
+        $selectedMembers = $group->users->pluck('id')->toArray();
 
-        return view('groups.edit', compact('group', 'users'));
+        return view('groups.edit', compact('group', 'users', 'selectedMembers'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Group $group)
+    public function update(Request $request, Group $group): RedirectResponse
     {
-        Gate::authorize('update', $group);
+        $this->authorize('update', $group);
+
         $validated = $request->validate([
-            'name' => 'required|string|max:32',
-            'members' => 'array|exists:users,id',
+            'name' => 'required|string|max:255',
+            'members' => 'required|array|exists:users,id',
         ]);
 
-        if (! collect($validated['members'])->contains(auth()->id())) {
-            return redirect()->back()->with('error', 'You cannot remove yourself from the group!');
+        $memberIds = collect($validated['members']);
+
+        if (! $memberIds->contains(auth()->id())) {
+            return redirect()
+                ->back()
+                ->withErrors(['members' => 'You cannot remove yourself from the group!']);
         }
 
-        $group->name = $validated['name'];
+        $group->update(['name' => $validated['name']]);
         $group->users()->sync($validated['members']);
 
-        $group->save();
-
-        return redirect()->route('groups.index')->with('success', 'Group updated successfully!');
+        return redirect()
+            ->route('groups.index')
+            ->with('success', 'Group updated successfully!');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Group $group)
+    public function destroy(Group $group): RedirectResponse
     {
-        Gate::authorize('delete', $group);
+        $this->authorize('delete', $group);
+
         $group->delete();
 
-        return redirect()->route('groups.index')->with('success', 'Group deleted successfully!');
+        return redirect()
+            ->route('groups.index')
+            ->with('success', 'Group deleted successfully!');
+    }
+
+    private function calculateUserBalances(Group $group, Collection $userDebts): Collection
+    {
+        return $group->users->mapWithKeys(function ($user) use ($group, $userDebts) {
+            $userDebtsForUser = $userDebts->get((string) $user->id, collect());
+
+            [$relationships, $totals] = $this->processUserRelationships($user, $userDebtsForUser, $group);
+
+            $netAmount = $totals['owed'] - $totals['owing'];
+
+            return [
+                (string) $user->id => [
+                    'user' => $user,
+                    'relationships' => $relationships,
+                    'total_owed' => number_format($totals['owed'], 2),
+                    'total_owing' => number_format($totals['owing'], 2),
+                    'net_amount' => number_format(abs($netAmount), 2),
+                    'net_type' => $this->determineNetType($netAmount),
+                ],
+            ];
+        });
+    }
+
+    private function processUserRelationships($user, Collection $userDebts, Group $group): array
+    {
+        $relationships = collect();
+        $totals = ['owed' => 0, 'owing' => 0];
+
+        $userDebts->each(function ($amount, $otherUserId) use (&$relationships, &$totals, $group) {
+            $otherUser = $group->users->firstWhere('id', $otherUserId);
+            $formattedAmount = number_format(abs($amount), 2);
+
+            if ($amount > 0) {
+                $relationships->push([
+                    'type' => 'owes',
+                    'user' => $otherUser,
+                    'amount' => $formattedAmount,
+                    'raw_amount' => $amount,
+                ]);
+                $totals['owing'] += $amount;
+            } elseif ($amount < 0) {
+                $relationships->push([
+                    'type' => 'owed',
+                    'user' => $otherUser,
+                    'amount' => $formattedAmount,
+                    'raw_amount' => abs($amount),
+                ]);
+                $totals['owed'] += abs($amount);
+            }
+        });
+
+        return [$relationships->all(), $totals];
+    }
+
+    private function determineNetType(float $netAmount): string
+    {
+        return match (true) {
+            $netAmount > 0 => 'positive',
+            $netAmount < 0 => 'negative',
+            default => 'neutral'
+        };
+    }
+
+    private function getRecentSharedDebts(Group $group): Collection
+    {
+        return $group->sharedDebts()
+            ->latest()
+            ->take(3)
+            ->get()
+            ->map(fn ($debt) => [
+                'debt' => $debt,
+                'shares' => $debt->getUserShares(),
+                'can_edit' => $debt->created_by === auth()->id(),
+            ]);
+    }
+
+    private function getRecentTransactions(Group $group): Collection
+    {
+        return $group->transactions()
+            ->latest()
+            ->take(3)
+            ->get()
+            ->map(fn ($transaction) => [
+                'transaction' => $transaction,
+                'can_edit' => $transaction->payer_id === auth()->id(),
+            ]);
+    }
+
+    private function getActiveRecurringDebts(Group $group): Collection
+    {
+        return $group->recurringSharedDebts()
+            ->where('is_active', true)
+            ->take(3)
+            ->get();
     }
 }

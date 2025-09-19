@@ -8,12 +8,12 @@
                 <select name="recipient_id" id="recipient_id"
                     class="mt-1 block w-full border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white dark:bg-gray-700 text-gray-700 dark:text-white">
                     <option value="">Select Recipient</option>
-                    @foreach ($group->users as $user)
-                        @if ($user->id !== auth()->id())
-                            <option value="{{ $user->id }}"
-                                {{ old('recipient_id') == $user->id ? 'selected' : '' }}>{{ $user->name }}</option>
-                        @endif
-                    @endforeach
+                     @foreach ($group->users as $user)
+                         @if ($user->id !== auth()->id())
+                             <option value="{{ $user->id }}"
+                                 {{ (old('recipient_id', $preselectedRecipient) == $user->id) ? 'selected' : '' }}>{{ $user->name }}</option>
+                         @endif
+                     @endforeach
                 </select>
                 @error('recipient_id')
                     <x-input-error messages="{{ $message }}" class="mt-2" />

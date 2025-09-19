@@ -4,57 +4,74 @@ namespace App\Http\Controllers;
 
 use App\Models\Group;
 use App\Models\Transaction;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
+use Illuminate\View\View;
 
 class TransactionController extends Controller
 {
-    public function index(Group $group)
+    public function index(Group $group): View
     {
-        $transactions = $group->transactions()->with(['payer', 'recipient'])->orderBy('created_at', 'desc')->get();
+        $this->authorize('view', $group);
+
+        $transactions = $group->transactions()
+            ->latest()
+            ->get();
 
         return view('transactions.index', compact('group', 'transactions'));
     }
 
-    public function create(Group $group)
+    public function create(Group $group): View
     {
-        return view('transactions.create', compact('group'));
+        $this->authorize('view', $group);
+
+        $otherMembers = $group->users->where('id', '!=', auth()->id());
+        $preselectedRecipient = $otherMembers->count() === 1 ? $otherMembers->first()->id : null;
+
+        return view('transactions.create', compact('group', 'preselectedRecipient'));
     }
 
-    public function store(Request $request, Group $group)
+    public function store(Request $request, Group $group): RedirectResponse
     {
+        $this->authorize('view', $group);
+
         $validated = $request->validate([
             'recipient_id' => 'required|exists:users,id',
             'amount' => 'required|numeric|min:0.01',
             'description' => 'nullable|string|max:255',
         ]);
 
-        if (! $group->users->contains($validated['recipient_id'])) {
-            return redirect()->back()->withErrors([
-                'error' => 'The recipient is not part of the group!',
-            ]);
+        if (! $this->isUserInGroup($validated['recipient_id'], $group)) {
+            return redirect()
+                ->back()
+                ->withErrors(['recipient_id' => 'The selected recipient is not part of this group.'])
+                ->withInput();
         }
 
-        $validated['group_id'] = $group->id;
-        $validated['payer_id'] = auth()->id();
-
-        Transaction::create($validated);
+        Transaction::query()->create([
+            ...$validated,
+            'group_id' => $group->id,
+            'payer_id' => $request->user()->id,
+        ]);
 
         return redirect()
-            ->route('groups.show', $validated['group_id'])
+            ->route('groups.show', $group->id)
             ->with('success', 'Transaction added successfully!');
     }
 
-    public function edit(Group $group, Transaction $transaction)
+    public function edit(Group $group, Transaction $transaction): View
     {
-        Gate::authorize('update', $transaction);
+        $this->authorize('update', $transaction);
 
-        return view('transactions.edit', compact('group', 'transaction'));
+        $otherMembers = $group->users->where('id', '!=', auth()->id());
+        $preselectedRecipient = $otherMembers->count() === 1 ? $otherMembers->first()->id : null;
+
+        return view('transactions.edit', compact('group', 'transaction', 'preselectedRecipient'));
     }
 
-    public function update(Request $request, Group $group, Transaction $transaction)
+    public function update(Request $request, Group $group, Transaction $transaction): RedirectResponse
     {
-        Gate::authorize('update', $transaction);
+        $this->authorize('update', $transaction);
 
         $validated = $request->validate([
             'recipient_id' => 'required|exists:users,id',
@@ -62,10 +79,11 @@ class TransactionController extends Controller
             'description' => 'nullable|string|max:255',
         ]);
 
-        if (! $group->users->contains($validated['recipient_id'])) {
-            return redirect()->back()->withErrors([
-                'error' => 'The recipient is not part of the group!',
-            ]);
+        if (! $this->isUserInGroup($validated['recipient_id'], $group)) {
+            return redirect()
+                ->back()
+                ->withErrors(['recipient_id' => 'The selected recipient is not part of this group.'])
+                ->withInput();
         }
 
         $transaction->update($validated);
@@ -75,11 +93,19 @@ class TransactionController extends Controller
             ->with('success', 'Transaction updated successfully!');
     }
 
-    public function destroy(Group $group, Transaction $transaction)
+    public function destroy(Group $group, Transaction $transaction): RedirectResponse
     {
-        Gate::authorize('delete', $transaction);
+        $this->authorize('delete', $transaction);
+
         $transaction->delete();
 
-        return back()->with('success', 'Transaction deleted successfully!');
+        return redirect()
+            ->back()
+            ->with('success', 'Transaction deleted successfully!');
+    }
+
+    private function isUserInGroup(int $userId, Group $group): bool
+    {
+        return $group->users->contains('id', $userId);
     }
 }

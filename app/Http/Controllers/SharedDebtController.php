@@ -4,25 +4,35 @@ namespace App\Http\Controllers;
 
 use App\Models\Group;
 use App\Models\SharedDebt;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Collection;
+use Illuminate\View\View;
 
 class SharedDebtController extends Controller
 {
-    public function index(Group $group)
+    public function index(Group $group): View
     {
-        $sharedDebts = $group->sharedDebts()->with(['creator', 'users'])->orderBy('created_at', 'desc')->get();
+        $this->authorize('view', $group);
+
+        $sharedDebts = $group->sharedDebts()
+            ->latest()
+            ->get();
 
         return view('sharedDebts.index', compact('group', 'sharedDebts'));
     }
 
-    public function create(Group $group)
+    public function create(Group $group): View
     {
+        $this->authorize('view', $group);
+
         return view('sharedDebts.create', compact('group'));
     }
 
-    public function store(Request $request, Group $group)
+    public function store(Request $request, Group $group): RedirectResponse
     {
+        $this->authorize('view', $group);
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'amount' => 'required|numeric|min:0.01',
@@ -30,20 +40,18 @@ class SharedDebtController extends Controller
             'members.*' => 'exists:users,id',
         ]);
 
-        // Check if all specified members are in the group
-        $invalidMembers = collect($validated['members'])->filter(function ($memberId) use ($group) {
-            return ! $group->users->contains('id', $memberId);
-        });
+        $invalidMembers = $this->validateGroupMembers($validated['members'], $group);
 
         if ($invalidMembers->isNotEmpty()) {
-            return redirect()->back()->withErrors([
-                'error' => 'Some members are not part of this group: '.implode(', ', $invalidMembers->toArray()),
-            ]);
+            return redirect()
+                ->back()
+                ->withErrors(['members' => 'Some selected members are not part of this group.'])
+                ->withInput();
         }
 
-        $sharedDebt = SharedDebt::create([
+        $sharedDebt = SharedDebt::query()->create([
             'group_id' => $group->id,
-            'created_by' => auth()->id(),
+            'created_by' => $request->user()->id,
             'name' => $validated['name'],
             'amount' => $validated['amount'],
         ]);
@@ -55,14 +63,16 @@ class SharedDebtController extends Controller
             ->with('success', 'Shared debt added successfully!');
     }
 
-    public function edit(Group $group, SharedDebt $sharedDebt)
+    public function edit(Group $group, SharedDebt $sharedDebt): View
     {
+        $this->authorize('update', $sharedDebt);
+
         return view('sharedDebts.edit', compact('group', 'sharedDebt'));
     }
 
-    public function update(Request $request, Group $group, SharedDebt $sharedDebt)
+    public function update(Request $request, Group $group, SharedDebt $sharedDebt): RedirectResponse
     {
-        Gate::authorize('update', $sharedDebt);
+        $this->authorize('update', $sharedDebt);
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -71,15 +81,13 @@ class SharedDebtController extends Controller
             'members.*' => 'exists:users,id',
         ]);
 
-        // Check if all specified members are in the group
-        $invalidMembers = collect($validated['members'])->filter(function ($memberId) use ($group) {
-            return ! $group->users->contains('id', $memberId);
-        });
+        $invalidMembers = $this->validateGroupMembers($validated['members'], $group);
 
         if ($invalidMembers->isNotEmpty()) {
-            return redirect()->back()->withErrors([
-                'error' => 'Some members are not part of this group: '.implode(', ', $invalidMembers->toArray()),
-            ])->withInput();  // Keep the input values
+            return redirect()
+                ->back()
+                ->withErrors(['members' => 'Some selected members are not part of this group.'])
+                ->withInput();
         }
 
         $sharedDebt->update([
@@ -94,13 +102,21 @@ class SharedDebtController extends Controller
             ->with('success', 'Shared debt updated successfully!');
     }
 
-    public function destroy(Group $group, SharedDebt $sharedDebt)
+    public function destroy(Group $group, SharedDebt $sharedDebt): RedirectResponse
     {
-        Gate::authorize('delete', $sharedDebt);
+        $this->authorize('delete', $sharedDebt);
+
         $sharedDebt->delete();
 
         return redirect()
-            ->route('groups.show', $sharedDebt['group_id'])
+            ->route('groups.show', $group->id)
             ->with('success', 'Shared debt deleted successfully!');
+    }
+
+    private function validateGroupMembers(array $memberIds, Group $group): Collection
+    {
+        return collect($memberIds)->filter(
+            fn ($memberId) => ! $group->users->contains('id', $memberId)
+        );
     }
 }

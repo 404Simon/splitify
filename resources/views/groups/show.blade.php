@@ -32,33 +32,24 @@
                 class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 sm:p-6 mb-6">
                 <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Balance Overview</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    @foreach ($group->users as $user)
+                    @foreach ($userBalances as $userId => $balance)
                         <div
                             class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg border border-gray-100 dark:border-gray-600">
-                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">{{ $user->name }}
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+                                {{ $balance['user']->name }}
                             </h3>
                             <div class="space-y-2">
-                                @php
-                                    $totalOwed = 0;
-                                    $totalOwing = 0;
-                                @endphp
-                                @foreach ($userDebts[$user->id] ?? [] as $otherUserId => $amount)
-                                    @php
-                                        $otherUser = $group->users->find($otherUserId);
-                                        $formattedAmount = number_format(abs($amount), 2);
-                                    @endphp
-                                    @if ($amount > 0)
+                                @foreach ($balance['relationships'] as $relationship)
+                                    @if ($relationship['type'] === 'owes')
                                         <div class="text-sm text-red-600 dark:text-red-400">
-                                            Owes {{ $otherUser->name }} <span
-                                                class="font-semibold">€{{ $formattedAmount }}</span>
+                                            Owes {{ $relationship['user']->name }} <span
+                                                class="font-semibold">€{{ $relationship['amount'] }}</span>
                                         </div>
-                                        @php $totalOwing += $amount; @endphp
-                                    @elseif($amount < 0)
+                                    @elseif($relationship['type'] === 'owed')
                                         <div class="text-sm text-green-600 dark:text-green-400">
-                                            Is owed by {{ $otherUser->name }} <span
-                                                class="font-semibold">€{{ $formattedAmount }}</span>
+                                            Is owed by {{ $relationship['user']->name }} <span
+                                                class="font-semibold">€{{ $relationship['amount'] }}</span>
                                         </div>
-                                        @php $totalOwed -= $amount; @endphp
                                     @endif
                                 @endforeach
                             </div>
@@ -66,19 +57,19 @@
                             <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600 space-y-1">
                                 <div class="text-xs text-gray-600 dark:text-gray-400">
                                     Total Owed: <span
-                                        class="{{ $totalOwed > 0 ? 'text-green-600 dark:text-green-400' : 'text-gray-500' }} font-medium">€{{ number_format($totalOwed, 2) }}</span>
+                                        class="{{ $balance['total_owed'] > 0 ? 'text-green-600 dark:text-green-400' : 'text-gray-500' }} font-medium">€{{ $balance['total_owed'] }}</span>
                                 </div>
                                 <div class="text-xs text-gray-600 dark:text-gray-400">
                                     Total Owing: <span
-                                        class="{{ $totalOwing > 0 ? 'text-red-600 dark:text-red-400' : 'text-gray-500' }} font-medium">€{{ number_format($totalOwing, 2) }}</span>
+                                        class="{{ $balance['total_owing'] > 0 ? 'text-red-600 dark:text-red-400' : 'text-gray-500' }} font-medium">€{{ $balance['total_owing'] }}</span>
                                 </div>
-                                @if ($totalOwed > $totalOwing)
+                                @if ($balance['net_type'] === 'positive')
                                     <div class="text-sm font-semibold text-green-600 dark:text-green-400">
-                                        Net: +€{{ number_format($totalOwed - $totalOwing, 2) }}
+                                        Net: +€{{ $balance['net_amount'] }}
                                     </div>
-                                @elseif($totalOwing > $totalOwed)
+                                @elseif($balance['net_type'] === 'negative')
                                     <div class="text-sm font-semibold text-red-600 dark:text-red-400">
-                                        Net: -€{{ number_format($totalOwing - $totalOwed, 2) }}
+                                        Net: -€{{ $balance['net_amount'] }}
                                     </div>
                                 @else
                                     <div class="text-sm font-semibold text-gray-600 dark:text-gray-400">
@@ -92,7 +83,7 @@
             </div>
 
             <!-- Active Recurring Debts -->
-            @if ($group->recurringSharedDebts->where('is_active', true)->isNotEmpty())
+            @if ($activeRecurringDebts->isNotEmpty())
                 <div
                     class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 sm:p-6 mb-6">
                     <div
@@ -108,7 +99,7 @@
                         </a>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        @foreach ($group->recurringSharedDebts->where('is_active', true)->take(3) as $recurringDebt)
+                        @foreach ($activeRecurringDebts as $recurringDebt)
                             <a href="{{ route('groups.recurring-debts.show', [$group, $recurringDebt]) }}"
                                 class="block bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg border border-purple-200 dark:border-purple-800 hover:bg-purple-100 dark:hover:bg-purple-900/30 transition-colors duration-200">
                                 <div class="flex justify-between items-start mb-2">
@@ -148,7 +139,7 @@
                 class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 sm:p-6 mb-6">
                 <div class="flex flex-col space-y-2 sm:flex-row sm:items-center sm:justify-between sm:space-y-0 mb-4">
                     <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Recent Shared Debts</h2>
-                    @if (!$group->sharedDebts->isEmpty())
+                    @if ($recentSharedDebts->isNotEmpty())
                         <x-enhanced-button href="{{ route('groups.sharedDebts.create', $group->id) }}"
                             variant="danger">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -169,7 +160,7 @@
                     @endif
                 </div>
 
-                @if ($group->sharedDebts->isEmpty())
+                @if ($recentSharedDebts->isEmpty())
                     <div class="text-center py-8">
                         <div
                             class="w-16 h-16 mx-auto mb-4 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center">
@@ -188,25 +179,25 @@
                     </div>
                 @else
                     <div class="space-y-4">
-                        @foreach ($group->sharedDebts->sortByDesc('created_at')->take(3) as $debt)
+                        @foreach ($recentSharedDebts as $debtData)
                             <div
                                 class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 border border-gray-100 dark:border-gray-600">
                                 <div
                                     class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
                                     <div class="flex-1 min-w-0">
                                         <h3 class="text-lg font-semibold text-gray-900 dark:text-white truncate">
-                                            {{ $debt->name }}</h3>
+                                            {{ $debtData['debt']->name }}</h3>
                                         <p class="text-2xl font-bold text-red-600 dark:text-red-400">
-                                            €{{ number_format($debt->amount, 2) }}</p>
+                                            €{{ number_format($debtData['debt']->amount, 2) }}</p>
                                         <p class="text-sm text-gray-600 dark:text-gray-400">
-                                            Created by {{ $debt->creator->name }} •
-                                            {{ $debt->created_at->format('M j, Y') }}
+                                            Created by {{ $debtData['debt']->creator->name }} •
+                                            {{ $debtData['debt']->created_at->format('M j, Y') }}
                                         </p>
                                     </div>
-                                    @if ($debt->created_by === Auth::id())
+                                    @if ($debtData['can_edit'])
                                         <div class="flex flex-wrap gap-2">
                                             <x-enhanced-button
-                                                href="{{ route('groups.sharedDebts.edit', ['group' => $group->id, 'sharedDebt' => $debt->id]) }}"
+                                                href="{{ route('groups.sharedDebts.edit', ['group' => $group->id, 'sharedDebt' => $debtData['debt']->id]) }}"
                                                 variant="secondary" size="sm">
                                                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor"
                                                     viewBox="0 0 24 24">
@@ -217,7 +208,7 @@
                                                 Edit
                                             </x-enhanced-button>
                                             <form
-                                                action="{{ route('groups.sharedDebts.destroy', ['group' => $group->id, 'sharedDebt' => $debt->id]) }}"
+                                                action="{{ route('groups.sharedDebts.destroy', ['group' => $group->id, 'sharedDebt' => $debtData['debt']->id]) }}"
                                                 method="POST" class="inline">
                                                 @csrf
                                                 @method('DELETE')
@@ -237,10 +228,10 @@
                                 </div>
                                 <div class="mt-3">
                                     <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Split between
-                                        {{ count($debt->getUserShares()) }}
-                                        {{ count($debt->getUserShares()) === 1 ? 'member' : 'members' }}:</p>
+                                        {{ count($debtData['shares']) }}
+                                        {{ count($debtData['shares']) === 1 ? 'member' : 'members' }}:</p>
                                     <div class="flex flex-wrap gap-2">
-                                        @foreach ($debt->getUserShares() as $share)
+                                        @foreach ($debtData['shares'] as $share)
                                             <span
                                                 class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400">
                                                 {{ $share['user']->name }}: €{{ number_format($share['amount'], 2) }}
@@ -251,7 +242,7 @@
                             </div>
                         @endforeach
 
-                        @if ($group->sharedDebts->count() > 5)
+                        @if ($group->sharedDebts->count() > 3)
                             <div class="text-center pt-4">
                                 <a href="{{ route('groups.sharedDebts.index', $group->id) }}"
                                     class="inline-flex items-center text-sm font-medium text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 transition-colors">
@@ -273,7 +264,7 @@
                 class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 sm:p-6 mb-6">
                 <div class="flex flex-col space-y-2 sm:flex-row sm:items-center sm:justify-between sm:space-y-0 mb-4">
                     <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Recent Transactions</h2>
-                    @if (!$group->transactions->isEmpty())
+                    @if ($recentTransactions->isNotEmpty())
                         <x-enhanced-button href="{{ route('groups.transactions.create', $group->id) }}"
                             variant="success">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -294,7 +285,7 @@
                     @endif
                 </div>
 
-                @if ($group->transactions->isEmpty())
+                @if ($recentTransactions->isEmpty())
                     <div class="text-center py-8">
                         <div
                             class="w-16 h-16 mx-auto mb-4 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center">
@@ -314,26 +305,27 @@
                     </div>
                 @else
                     <div class="space-y-4">
-                        @foreach ($group->transactions->sortByDesc('created_at')->take(3) as $transaction)
+                        @foreach ($recentTransactions as $transactionData)
                             <div
                                 class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 border border-gray-100 dark:border-gray-600">
                                 <div
                                     class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
                                     <div class="flex-1 min-w-0">
                                         <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-                                            {{ $transaction->description ?? 'Payment' }}
+                                            {{ $transactionData['transaction']->description ?? 'Payment' }}
                                         </h3>
                                         <p class="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
-                                            €{{ number_format($transaction->amount, 2) }}</p>
+                                            €{{ number_format($transactionData['transaction']->amount, 2) }}</p>
                                         <p class="text-sm text-gray-600 dark:text-gray-400">
-                                            {{ $transaction->payer->name }} → {{ $transaction->recipient->name }} •
-                                            {{ $transaction->created_at->format('M j, Y') }}
+                                            {{ $transactionData['transaction']->payer->name }} →
+                                            {{ $transactionData['transaction']->recipient->name }} •
+                                            {{ $transactionData['transaction']->created_at->format('M j, Y') }}
                                         </p>
                                     </div>
-                                    @if ($transaction->payer_id === Auth::id())
+                                    @if ($transactionData['can_edit'])
                                         <div class="flex flex-wrap gap-2">
                                             <x-enhanced-button
-                                                href="{{ route('groups.transactions.edit', ['group' => $group->id, 'transaction' => $transaction->id]) }}"
+                                                href="{{ route('groups.transactions.edit', ['group' => $group->id, 'transaction' => $transactionData['transaction']->id]) }}"
                                                 variant="secondary" size="sm">
                                                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor"
                                                     viewBox="0 0 24 24">
@@ -344,7 +336,7 @@
                                                 Edit
                                             </x-enhanced-button>
                                             <form
-                                                action="{{ route('groups.transactions.destroy', ['group' => $group->id, 'transaction' => $transaction->id]) }}"
+                                                action="{{ route('groups.transactions.destroy', ['group' => $group->id, 'transaction' => $transactionData['transaction']->id]) }}"
                                                 method="POST" class="inline">
                                                 @csrf
                                                 @method('DELETE')
@@ -365,7 +357,7 @@
                             </div>
                         @endforeach
 
-                        @if ($group->transactions->count() > 5)
+                        @if ($group->transactions->count() > 3)
                             <div class="text-center pt-4">
                                 <a href="{{ route('groups.transactions.index', $group->id) }}"
                                     class="inline-flex items-center text-sm font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 transition-colors">

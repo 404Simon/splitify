@@ -12,7 +12,7 @@
                     class="mt-1 block w-full border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white dark:bg-gray-700 text-gray-700 dark:text-white"
                     multiple required>
                     @foreach ($users as $user)
-                        <option value="{{ $user->id }}" @if (in_array($user->id, $group->users->pluck('id')->toArray())) selected @endif>
+                        <option value="{{ $user->id }}" @selected(in_array($user->id, $selectedMembers))>
                             {{ $user->name }}
                         </option>
                     @endforeach
