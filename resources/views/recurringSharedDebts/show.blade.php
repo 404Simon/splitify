@@ -10,24 +10,21 @@
                 </div>
 
                 <div class="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-start">
-                    <a href="{{ route('groups.recurring-debts.index', $group) }}"
-                        class="inline-flex items-center justify-center px-4 py-3 sm:py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-base sm:text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors min-h-[44px]">
-                        <svg class="w-5 h-5 sm:w-4 sm:h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <x-enhanced-button variant="secondary" :href="route('groups.recurring-debts.index', $group)">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                         </svg>
                         Back to Recurring Debts
-                    </a>
+                    </x-enhanced-button>
                     @can('update', $recurringDebt)
-                        <a href="{{ route('groups.recurring-debts.edit', [$group, $recurringDebt]) }}"
-                            class="inline-flex items-center justify-center px-4 py-3 sm:py-2 bg-indigo-600 border border-transparent rounded-lg text-base sm:text-sm font-medium text-white hover:bg-indigo-700 transition-colors min-h-[44px]">
-                            <svg class="w-5 h-5 sm:w-4 sm:h-4 mr-2" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
+                        <x-enhanced-button variant="primary" :href="route('groups.recurring-debts.edit', [$group, $recurringDebt])">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                             </svg>
                             Edit
-                        </a>
+                        </x-enhanced-button>
                     @endcan
                 </div>
             </div>
@@ -107,7 +104,7 @@
                                             <p class="font-semibold text-gray-900 dark:text-white text-base sm:text-sm">
                                                 €{{ $share['amount'] }}</p>
                                             <p class="text-xs text-gray-500 dark:text-gray-400">per
-                                                {{ strtolower($recurringDebt->frequency_label) }}</p>
+                                                {{ strtolower($recurringDebt->frequency_label) === 'monthly' ? 'month' : strtolower($recurringDebt->frequency_label) }}</p>
                                         </div>
                                     </div>
                                 @endforeach
@@ -165,15 +162,14 @@
                                             action="{{ route('groups.recurring-debts.generate-now', [$group, $recurringDebt]) }}"
                                             method="POST">
                                             @csrf
-                                            <button type="submit"
-                                                class="w-full inline-flex justify-center items-center px-4 py-3 sm:py-2 bg-indigo-600 border border-transparent rounded-lg text-base sm:text-sm font-medium text-white hover:bg-indigo-700 transition-colors min-h-[44px]">
-                                                <svg class="w-5 h-5 sm:w-4 sm:h-4 mr-2" fill="none" stroke="currentColor"
+                                            <x-enhanced-button type="submit" variant="primary" fullWidth="true">
+                                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor"
                                                     viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                         d="M12 4v16m8-8H4" />
                                                 </svg>
                                                 Generate Now
-                                            </button>
+                                            </x-enhanced-button>
                                         </form>
 
                                         <form
@@ -181,15 +177,14 @@
                                             method="POST">
                                             @csrf
                                             @method('PATCH')
-                                            <button type="submit"
-                                                class="w-full inline-flex justify-center items-center px-4 py-3 sm:py-2 bg-yellow-600 border border-transparent rounded-lg text-base sm:text-sm font-medium text-white hover:bg-yellow-700 transition-colors min-h-[44px]">
-                                                <svg class="w-5 h-5 sm:w-4 sm:h-4 mr-2" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M10 9v6m4-6v6" />
-                                                </svg>
+                                            <x-enhanced-button type="submit" variant="warning" fullWidth="true">
+                                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor"
+                                                     viewBox="0 0 24 24">
+                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                         d="M10 9v6m4-6v6" />
+                                                 </svg>
                                                 Pause
-                                            </button>
+                                            </x-enhanced-button>
                                         </form>
                                     @else
                                         <form
@@ -197,15 +192,14 @@
                                             method="POST">
                                             @csrf
                                             @method('PATCH')
-                                            <button type="submit"
-                                                class="w-full inline-flex justify-center items-center px-4 py-3 sm:py-2 bg-green-600 border border-transparent rounded-lg text-base sm:text-sm font-medium text-white hover:bg-green-700 transition-colors min-h-[44px]">
-                                                <svg class="w-5 h-5 sm:w-4 sm:h-4 mr-2" fill="none" stroke="currentColor"
+                                            <x-enhanced-button type="submit" variant="success" fullWidth="true">
+                                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor"
                                                     viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                         d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h.01M12 5v.01M3 12a9 9 0 1118 0 9 9 0 01-18 0z" />
                                                 </svg>
                                                 Resume
-                                            </button>
+                                            </x-enhanced-button>
                                         </form>
                                     @endif
                                 </div>
@@ -254,15 +248,14 @@
                                     onsubmit="return confirm('Are you sure? This will delete the recurring debt but keep all generated debts.')">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit"
-                                        class="w-full inline-flex justify-center items-center px-4 py-3 sm:py-2 bg-red-600 border border-transparent rounded-lg text-base sm:text-sm font-medium text-white hover:bg-red-700 transition-colors min-h-[44px]">
-                                        <svg class="w-5 h-5 sm:w-4 sm:h-4 mr-2" fill="none" stroke="currentColor"
+                                    <x-enhanced-button type="submit" variant="danger" fullWidth="true">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor"
                                             viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                         </svg>
                                         Delete Recurring Debt
-                                    </button>
+                                    </x-enhanced-button>
                                 </form>
                             </div>
                         </div>

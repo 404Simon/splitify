@@ -21,7 +21,7 @@
                     @endforeach
                 </div>
             </div>
-            <x-button>Add Debt</x-button>
+            <x-enhanced-button variant="primary" type="submit">Add Debt</x-enhanced-button>
         </form>
     </x-form-container>
 </x-app-layout>

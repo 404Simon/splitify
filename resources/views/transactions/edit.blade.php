@@ -1,6 +1,7 @@
 <x-app-layout>
     <x-form-container title="Edit Transaction for {{ $group->name }}">
-        <form action="{{ route('groups.transactions.update', [$group->id, $transaction->id]) }}" method="POST" class="space-y-4">
+        <form action="{{ route('groups.transactions.update', [$group->id, $transaction->id]) }}" method="POST"
+            class="space-y-4">
             @csrf
             @method('PUT')
 
@@ -12,7 +13,8 @@
                     <option value="">Select Recipient</option>
                     @foreach ($group->users as $user)
                         @if ($user->id !== auth()->id())
-                            <option value="{{ $user->id }}" {{ old('recipient_id', $transaction->recipient_id) == $user->id ? 'selected' : '' }}>
+                            <option value="{{ $user->id }}"
+                                {{ old('recipient_id', $transaction->recipient_id) == $user->id ? 'selected' : '' }}>
                                 {{ $user->name }}
                             </option>
                         @endif
@@ -23,9 +25,11 @@
                 @enderror
             </div>
 
-            <x-input-with-label label="Amount (€)" name="amount" type="number" step="0.01" required value="{{ old('amount', $transaction->amount) }}" />
-            <x-input-with-label label="Description" name="description" type="text" value="{{ old('description', $transaction->description) }}" />
-            <x-button>Update Transaction</x-button>
+            <x-input-with-label label="Amount (€)" name="amount" type="number" step="0.01" required
+                value="{{ old('amount', $transaction->amount) }}" />
+            <x-input-with-label label="Description" name="description" type="text"
+                value="{{ old('description', $transaction->description) }}" />
+            <x-enhanced-button variant="primary" type="submit">Update Transaction</x-enhanced-button>
         </form>
     </x-form-container>
 </x-app-layout>

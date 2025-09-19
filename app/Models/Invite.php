@@ -9,13 +9,14 @@ use Illuminate\Support\Str;
 class Invite extends Model
 {
     protected $primaryKey = 'uuid';
+
     public $incrementing = false;
 
     protected $fillable = [
         'group_id',
         'name',
         'is_reusable',
-        'duration_days'
+        'duration_days',
     ];
 
     protected static function booted(): void
@@ -40,8 +41,6 @@ class Invite extends Model
 
     /**
      * Check if the invite is still valid.
-     *
-     * @return bool
      */
     public function isValid(): bool
     {
@@ -50,6 +49,7 @@ class Invite extends Model
         }
 
         $expirationDate = $this->created_at->addDays($this->duration_days);
+
         return Carbon::now()->isBefore($expirationDate);
     }
 }

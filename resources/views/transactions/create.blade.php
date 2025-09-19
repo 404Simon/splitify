@@ -10,7 +10,8 @@
                     <option value="">Select Recipient</option>
                     @foreach ($group->users as $user)
                         @if ($user->id !== auth()->id())
-                            <option value="{{ $user->id }}" {{ old('recipient_id') == $user->id ? 'selected' : '' }}>{{ $user->name }}</option>
+                            <option value="{{ $user->id }}"
+                                {{ old('recipient_id') == $user->id ? 'selected' : '' }}>{{ $user->name }}</option>
                         @endif
                     @endforeach
                 </select>
@@ -18,9 +19,11 @@
                     <x-input-error messages="{{ $message }}" class="mt-2" />
                 @enderror
             </div>
-            <x-input-with-label label="Amount (€)" name="amount" type="number" step="0.01" required value="{{ old('amount') }}" />
-            <x-input-with-label label="Description" name="description" type="text" value="{{ old('description') }}" />
-            <x-button>Add Transaction</x-button>
+            <x-input-with-label label="Amount (€)" name="amount" type="number" step="0.01" required
+                value="{{ old('amount') }}" />
+            <x-input-with-label label="Description" name="description" type="text"
+                value="{{ old('description') }}" />
+            <x-enhanced-button variant="primary" type="submit">Add Transaction</x-enhanced-button>
         </form>
     </x-form-container>
 </x-app-layout>

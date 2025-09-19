@@ -21,16 +21,15 @@
                 </div>
             </div>
 
-            <x-button>Update Map Marker</x-button>
+            <x-enhanced-button type="submit">Update Map Marker</x-enhanced-button>
         </form>
         <form class="inline-block mt-2" action="{{ route('groups.mapMarkers.destroy', [$group->id, $mapMarker->id]) }}"
             method="POST">
             @csrf
             @method('DELETE')
-            <button type="submit"
-                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white focus:outline-none focus:ring-2 focus:ring-offset-2 bg-red-600 hover:bg-red-700 focus:ring-red-500 dark:bg-red-500 dark:hover:bg-red-600">
+            <x-enhanced-button type="submit" variant="danger">
                 Delete Marker
-            </button>
+            </x-enhanced-button>
         </form>
 
     </x-form-container>

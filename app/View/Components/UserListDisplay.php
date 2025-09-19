@@ -2,9 +2,9 @@
 
 namespace App\View\Components;
 
+use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
-use Closure;
 
 class UserListDisplay extends Component
 {
@@ -17,6 +17,7 @@ class UserListDisplay extends Component
     {
         $this->users = $users->map(function ($user) use ($groupAdminId) {
             $user->isGroupAdmin = $user->id === $groupAdminId;
+
             return $user;
         });
     }

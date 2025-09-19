@@ -9,6 +9,13 @@ use Illuminate\Support\Facades\Gate;
 
 class TransactionController extends Controller
 {
+    public function index(Group $group)
+    {
+        $transactions = $group->transactions()->with(['payer', 'recipient'])->orderBy('created_at', 'desc')->get();
+
+        return view('transactions.index', compact('group', 'transactions'));
+    }
+
     public function create(Group $group)
     {
         return view('transactions.create', compact('group'));
@@ -22,7 +29,7 @@ class TransactionController extends Controller
             'description' => 'nullable|string|max:255',
         ]);
 
-        if (!$group->users->contains($validated['recipient_id'])) {
+        if (! $group->users->contains($validated['recipient_id'])) {
             return redirect()->back()->withErrors([
                 'error' => 'The recipient is not part of the group!',
             ]);
@@ -41,6 +48,7 @@ class TransactionController extends Controller
     public function edit(Group $group, Transaction $transaction)
     {
         Gate::authorize('update', $transaction);
+
         return view('transactions.edit', compact('group', 'transaction'));
     }
 
@@ -54,7 +62,7 @@ class TransactionController extends Controller
             'description' => 'nullable|string|max:255',
         ]);
 
-        if (!$group->users->contains($validated['recipient_id'])) {
+        if (! $group->users->contains($validated['recipient_id'])) {
             return redirect()->back()->withErrors([
                 'error' => 'The recipient is not part of the group!',
             ]);
@@ -71,6 +79,7 @@ class TransactionController extends Controller
     {
         Gate::authorize('delete', $transaction);
         $transaction->delete();
+
         return back()->with('success', 'Transaction deleted successfully!');
     }
 }

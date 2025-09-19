@@ -18,8 +18,9 @@ class GeolocationService
             'limit' => 1,  // Only return the best match
         ]);
 
-        if ($response->successful() && !empty($response->json())) {
+        if ($response->successful() && ! empty($response->json())) {
             $data = $response->json()[0];
+
             return [
                 'lat' => $data['lat'],
                 'lon' => $data['lon'],

@@ -13,6 +13,7 @@ class InviteController extends Controller
     public function index(Request $request, Group $group): View
     {
         $invites = $group->invites();
+
         return view('invites.index', compact('group'));
     }
 
@@ -30,7 +31,7 @@ class InviteController extends Controller
         ]);
 
         $validated['group_id'] = $group->id;
-        if (!array_key_exists('is_reusable', $validated)) {
+        if (! array_key_exists('is_reusable', $validated)) {
             $validated['is_reusable'] = false;
         }
 
@@ -41,12 +42,12 @@ class InviteController extends Controller
 
     private function checkInvite(Invite $invite)
     {
-        if (!$invite->isValid()) {
+        if (! $invite->isValid()) {
             return redirect()->back()->with('error', 'The invite is not valid or has expired.');
         }
 
         $group = $invite->group;
-        if (!$group) {
+        if (! $group) {
             return redirect()->back()->with('error', 'The group associated with this invite was not found.');
         }
 
@@ -65,6 +66,7 @@ class InviteController extends Controller
         if (Auth::check()) {
             $invite = Invite::findOrFail($uuid);
             $this->checkInvite($invite);
+
             return view('invites.show', compact('invite'));
         }
 
@@ -73,12 +75,12 @@ class InviteController extends Controller
 
     public function accept(Request $request, Invite $invite)
     {
-        if (!$invite->isValid()) {
+        if (! $invite->isValid()) {
             return redirect()->back()->with('error', 'The invite is not valid or has expired.');
         }
 
         $group = $invite->group;
-        if (!$group) {
+        if (! $group) {
             return redirect()->back()->with('error', 'The group associated with this invite was not found.');
         }
 
@@ -89,7 +91,7 @@ class InviteController extends Controller
 
         $group->users()->attach($user);
 
-        if (!$invite->is_reusable) {
+        if (! $invite->is_reusable) {
             $invite->delete();
         }
 
@@ -100,7 +102,7 @@ class InviteController extends Controller
 
     public function deny(Request $request, Invite $invite)
     {
-        if (!$invite->is_reusable) {
+        if (! $invite->is_reusable) {
             $invite->delete();
         }
 
@@ -112,6 +114,7 @@ class InviteController extends Controller
     public function destroy(Group $group, Invite $invite)
     {
         $invite->delete();
+
         return redirect()->route('groups.invites.index', compact('group'))->with('success', 'Invite deleted successfully!');
     }
 }

@@ -1,6 +1,6 @@
 <x-app-layout>
-    <div class="container mx-auto px-4 py-8">
-        <h1 class="text-3xl font-bold text-gray-900 mb-6 dark:text-white">
+    <div class="container mx-auto px-4 py-6 sm:py-8">
+        <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 dark:text-white leading-tight">
             You've been invited to join {{ $invite->group->name }}
         </h1>
 
@@ -21,25 +21,23 @@
         @endif
 
         @if (!session('error'))
-            <div class="bg-white rounded-lg shadow p-6 dark:bg-gray-800">
-                <p class="mb-4 text-gray-700 dark:text-gray-300">
+            <div class="bg-white rounded-lg shadow p-4 sm:p-6 dark:bg-gray-800">
+                <p class="mb-6 text-gray-700 dark:text-gray-300 text-base sm:text-lg leading-relaxed">
                     Do you want to accept the invitation to join the group <span
-                        class="font-semibold">{{ $invite->group->name }}</span>?
+                        class="font-semibold text-gray-900 dark:text-white">{{ $invite->group->name }}</span>?
                 </p>
-                <div class="flex space-x-4">
-                    <form method="POST" action="{{ route('invites.accept', $invite->uuid) }}">
+                <div class="flex flex-col sm:flex-row gap-4 sm:gap-4">
+                    <form method="POST" action="{{ route('invites.accept', $invite->uuid) }}" class="flex-1">
                         @csrf
-                        <button type="submit"
-                            class="inline-flex items-center px-4 py-2 bg-green-500 hover:bg-green-700 text-white text-sm font-medium rounded-md dark:bg-green-600 dark:hover:bg-green-700">
-                            Accept
-                        </button>
+                        <x-enhanced-button type="submit" variant="success" class="w-full min-h-[48px] text-base font-medium">
+                            Accept Invitation
+                        </x-enhanced-button>
                     </form>
-                    <form method="POST" action="{{ route('invites.deny', $invite->uuid) }}">
+                    <form method="POST" action="{{ route('invites.deny', $invite->uuid) }}" class="flex-1">
                         @csrf
-                        <button type="submit"
-                            class="inline-flex items-center px-4 py-2 bg-red-500 hover:bg-red-700 text-white text-sm font-medium rounded-md dark:bg-red-600 dark:hover:bg-red-700">
-                            Decline
-                        </button>
+                        <x-enhanced-button type="submit" variant="danger" class="w-full min-h-[48px] text-base font-medium">
+                            Decline Invitation
+                        </x-enhanced-button>
                     </form>
                 </div>
             </div>

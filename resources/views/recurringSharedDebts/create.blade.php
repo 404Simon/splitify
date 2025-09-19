@@ -70,17 +70,15 @@
 
             <div
                 class="flex flex-col-reverse space-y-reverse space-y-3 pt-6 border-t border-gray-200 dark:border-gray-700 sm:flex-row sm:space-y-0 sm:space-x-4 sm:justify-end">
-                <a href="{{ route('groups.recurring-debts.index', $group) }}"
-                    class="inline-flex items-center justify-center px-4 py-3 sm:py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-base sm:text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                <x-enhanced-button variant="secondary" :href="route('groups.recurring-debts.index', $group)">
                     Cancel
-                </a>
-                <button type="submit"
-                    class="inline-flex items-center justify-center px-4 py-3 sm:py-2 bg-indigo-600 border border-transparent rounded-lg text-base sm:text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
-                    <svg class="w-5 h-5 sm:w-4 sm:h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                </x-enhanced-button>
+                <x-enhanced-button type="submit">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                     </svg>
                     Create Recurring Debt
-                </button>
+                </x-enhanced-button>
             </div>
         </form>
 

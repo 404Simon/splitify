@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class MapMarker extends Model
 {
@@ -15,7 +15,7 @@ class MapMarker extends Model
         'description',
         'address',
         'lat',
-        'lon'
+        'lon',
     ];
 
     public function group(): BelongsTo

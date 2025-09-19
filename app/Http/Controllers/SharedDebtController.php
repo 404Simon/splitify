@@ -9,6 +9,13 @@ use Illuminate\Support\Facades\Gate;
 
 class SharedDebtController extends Controller
 {
+    public function index(Group $group)
+    {
+        $sharedDebts = $group->sharedDebts()->with(['creator', 'users'])->orderBy('created_at', 'desc')->get();
+
+        return view('sharedDebts.index', compact('group', 'sharedDebts'));
+    }
+
     public function create(Group $group)
     {
         return view('sharedDebts.create', compact('group'));
@@ -25,12 +32,12 @@ class SharedDebtController extends Controller
 
         // Check if all specified members are in the group
         $invalidMembers = collect($validated['members'])->filter(function ($memberId) use ($group) {
-            return !$group->users->contains('id', $memberId);
+            return ! $group->users->contains('id', $memberId);
         });
 
         if ($invalidMembers->isNotEmpty()) {
             return redirect()->back()->withErrors([
-                'error' => 'Some members are not part of this group: ' . implode(', ', $invalidMembers->toArray()),
+                'error' => 'Some members are not part of this group: '.implode(', ', $invalidMembers->toArray()),
             ]);
         }
 
@@ -66,12 +73,12 @@ class SharedDebtController extends Controller
 
         // Check if all specified members are in the group
         $invalidMembers = collect($validated['members'])->filter(function ($memberId) use ($group) {
-            return !$group->users->contains('id', $memberId);
+            return ! $group->users->contains('id', $memberId);
         });
 
         if ($invalidMembers->isNotEmpty()) {
             return redirect()->back()->withErrors([
-                'error' => 'Some members are not part of this group: ' . implode(', ', $invalidMembers->toArray()),
+                'error' => 'Some members are not part of this group: '.implode(', ', $invalidMembers->toArray()),
             ])->withInput();  // Keep the input values
         }
 

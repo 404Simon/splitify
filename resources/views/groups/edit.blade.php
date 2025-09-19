@@ -18,12 +18,12 @@
                     @endforeach
                 </select>
             </div>
-            <x-button>Update Group</x-button>
+            <x-enhanced-button variant="primary" type="submit">Update Group</x-enhanced-button>
         </form>
         <form action="{{ route('groups.destroy', $group->id) }}" class="mt-4" method="POST">
             @csrf
             @method('DELETE')
-            <x-button variant="danger">Delete Group</x-button>
+            <x-enhanced-button variant="danger" type="submit">Delete Group</x-enhanced-button>
         </form>
     </x-form-container>
 </x-app-layout>

@@ -12,7 +12,7 @@
                 </div>
             </div>
 
-            <x-button>Create Map Marker</x-button>
+            <x-enhanced-button variant="primary">Create Map Marker</x-enhanced-button>
         </form>
     </x-form-container>
 </x-app-layout>

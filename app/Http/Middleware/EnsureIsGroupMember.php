@@ -3,9 +3,9 @@
 namespace App\Http\Middleware;
 
 use App\Models\Group;
+use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Closure;
 
 class EnsureIsGroupMember
 {
@@ -18,11 +18,11 @@ class EnsureIsGroupMember
     {
         $group = $request->route('group');
 
-        if (!$group instanceof Group) {
+        if (! $group instanceof Group) {
             $group = Group::find($group);
         }
 
-        if (!$group || !$group->users->contains(auth()->user())) {
+        if (! $group || ! $group->users->contains(auth()->user())) {
             abort(403, 'Unauthorized');
         }
 
