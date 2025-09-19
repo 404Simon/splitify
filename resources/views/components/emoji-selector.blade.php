@@ -43,6 +43,33 @@
         });
     },
 
+    positionDropdown() {
+        this.$nextTick(() => {
+            const dropdown = this.$refs.dropdown;
+            const button = this.$refs.button;
+            if (!dropdown || !button) return;
+
+            const buttonRect = button.getBoundingClientRect();
+            const dropdownHeight = 350; // Approximate height of dropdown
+            const viewportHeight = window.innerHeight;
+            const spaceBelow = viewportHeight - buttonRect.bottom;
+            const spaceAbove = buttonRect.top;
+
+            // Position dropdown above if there's not enough space below
+            if (spaceBelow < dropdownHeight && spaceAbove > spaceBelow) {
+                dropdown.style.bottom = '100%';
+                dropdown.style.top = 'auto';
+                dropdown.style.marginBottom = '8px';
+                dropdown.style.marginTop = '0px';
+            } else {
+                dropdown.style.top = '100%';
+                dropdown.style.bottom = 'auto';
+                dropdown.style.marginTop = '8px';
+                dropdown.style.marginBottom = '0px';
+            }
+        });
+    },
+
     updateFilteredResults() {
         let result = [];
         const searchQueryLower = this.searchQuery.toLowerCase();
@@ -81,7 +108,7 @@
 }" class="relative">
     <input type="hidden" name="{{ $name }}" x-ref="hiddenInput" value="{{ $value }}">
 
-    <button type="button" @click="isOpen = true"
+    <button type="button" @click="isOpen = true; positionDropdown()" x-ref="button"
         class="flex items-center justify-center w-12 h-12 text-2xl bg-white dark:bg-gray-700 border dark:border-gray-600 rounded-md shadow-sm hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400">
         <span x-text="selectedEmoji"></span>
     </button>
@@ -89,8 +116,8 @@
     <div x-show="isOpen" x-transition:enter="transition ease-out duration-200"
         x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
         x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 scale-100"
-        x-transition:leave-end="opacity-0 scale-95" @click.away="isOpen = false"
-        class="absolute z-50 mt-2 bg-white dark:bg-gray-800 rounded-lg shadow-xl border dark:border-gray-700"
+        x-transition:leave-end="opacity-0 scale-95" @click.away="isOpen = false" x-ref="dropdown"
+        class="absolute z-50 bg-white dark:bg-gray-800 rounded-lg shadow-xl border dark:border-gray-700"
         style="width: 300px;">
         <div class="p-3 border-b dark:border-gray-700">
             <div class="flex items-center">
