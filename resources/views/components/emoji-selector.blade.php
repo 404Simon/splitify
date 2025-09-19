@@ -47,6 +47,7 @@
         this.$nextTick(() => {
             const dropdown = this.$refs.dropdown;
             const button = this.$refs.button;
+            const searchInput = this.$refs.searchInput;
             if (!dropdown || !button) return;
 
             const buttonRect = button.getBoundingClientRect();
@@ -67,7 +68,17 @@
                 dropdown.style.marginTop = '8px';
                 dropdown.style.marginBottom = '0px';
             }
+
+            // Auto-focus search input on non-mobile devices
+            if (searchInput && !this.isMobile()) {
+                searchInput.focus();
+            }
         });
+    },
+
+    isMobile() {
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+               (navigator.maxTouchPoints && navigator.maxTouchPoints > 2 && /MacIntel/.test(navigator.platform));
     },
 
     updateFilteredResults() {
@@ -122,7 +133,7 @@
         <div class="p-3 border-b dark:border-gray-700">
             <div class="flex items-center">
                 <div class="flex-1">
-                    <input type="text"
+                    <input type="text" x-ref="searchInput"
                         class="w-full px-3 py-2 border dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                         placeholder="Search emoji..." x-model="searchQuery">
                 </div>
