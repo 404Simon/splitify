@@ -1,0 +1,11 @@
+{
+    "mcpServers": {
+        "laravel-boost": {
+            "command": "/usr/bin/php",
+            "args": [
+                "/home/simon/dev/splitify/artisan",
+                "boost:mcp"
+            ]
+        }
+    }
+}
