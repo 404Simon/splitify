@@ -62,7 +62,7 @@
                                         </div>
                                         @if ($group->created_by === Auth::id())
                                             <x-enhanced-button href="{{ route('groups.edit', $group->id) }}"
-                                                variant="warning" size="sm">
+                                                variant="warning">
                                                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor"
                                                     viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round"

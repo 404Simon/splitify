@@ -74,10 +74,9 @@ class GroupController extends Controller
     {
         $this->authorize('update', $group);
 
-        $users = User::all();
-        $selectedMembers = $group->users->pluck('id')->toArray();
+        $selectedUsers = $group->users;
 
-        return view('groups.edit', compact('group', 'users', 'selectedMembers'));
+        return view('groups.edit', compact('group', 'selectedUsers'));
     }
 
     public function update(Request $request, Group $group): RedirectResponse
@@ -109,11 +108,12 @@ class GroupController extends Controller
     {
         $this->authorize('delete', $group);
 
+        $groupName = $group->name;
         $group->delete();
 
         return redirect()
             ->route('groups.index')
-            ->with('success', 'Group deleted successfully!');
+            ->with('success', "Group '{$groupName}' and all associated data have been deleted successfully!");
     }
 
     private function calculateUserBalances(Group $group, Collection $userDebts): Collection

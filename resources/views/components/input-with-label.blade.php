@@ -8,6 +8,7 @@
     'step' => null,
     'min' => null,
     'max' => null,
+    'autofocus' => false,
 ])
 
 <div>
@@ -20,6 +21,7 @@
         @if ($value) value="{{ old($name, $value) }}" @endif
         @if ($min) min="{{ $min }}" @endif
         @if ($max) max="{{ $max }}" @endif
+        @if ($autofocus) autofocus @endif
         class="mt-1 block w-full border-gray-300 dark:border-gray-700 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-base bg-white dark:bg-gray-700 text-gray-700 dark:text-white min-h-[44px] px-3 py-2
             @error($name) border-red-500 dark:border-red-400 @enderror">
 

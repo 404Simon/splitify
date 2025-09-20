@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Group extends Model
 {
+    use HasFactory;
+
     protected $fillable = ['name', 'created_by'];
 
     public function users(): BelongsToMany
@@ -33,6 +36,26 @@ class Group extends Model
     public function recurringSharedDebts(): HasMany
     {
         return $this->hasMany(RecurringSharedDebt::class);
+    }
+
+    public function mapMarkers(): HasMany
+    {
+        return $this->hasMany(MapMarker::class);
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($group) {
+            // Delete all related data when group is deleted
+            $group->sharedDebts()->delete();
+            $group->transactions()->delete();
+            $group->invites()->delete();
+            $group->recurringSharedDebts()->delete();
+            $group->mapMarkers()->delete();
+            $group->users()->detach();
+        });
     }
 
     public function calculateUserDebts()

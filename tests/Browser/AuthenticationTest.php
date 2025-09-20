@@ -1,14 +1,12 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Browser;
 
 use App\Models\User;
 
 test('user can register', function () {
     visit('/')
         ->assertNoSmoke()
-        ->assertNoConsoleLogs()
-        ->assertNoJavaScriptErrors()
         ->assertPathIs('/login')
         ->assertSee("Don't have an account? Register here.")
         ->click('@register')

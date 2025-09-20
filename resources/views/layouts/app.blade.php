@@ -28,22 +28,28 @@
         @include('layouts.navigation')
 
         <!-- Notifications -->
-        <div x-data="{ show: true, messageType: '', message: '' }" x-init="@if (session('success')) messageType = 'success';
-                        message = '{{ session('success') }}';
-                        setTimeout(() => show = false, 3000);
+        <div x-data="{
+            show: true,
+            messageType: '',
+            message: '',
+            init() {
+                @if (session('success')) this.messageType = 'success';
+                        this.message = @js(session('success'));
+                        setTimeout(() => this.show = false, 3000);
                     @elseif(session('error'))
-                        messageType = 'error';
-                        message = '{{ session('error') }}';
-                        setTimeout(() => show = false, 5000);
+                        this.messageType = 'error';
+                        this.message = @js(session('error'));
+                        setTimeout(() => this.show = false, 5000);
                     @elseif(session('warning'))
-                        messageType = 'warning';
-                        message = '{{ session('warning') }}';
-                        setTimeout(() => show = false, 4000);
+                        this.messageType = 'warning';
+                        this.message = @js(session('warning'));
+                        setTimeout(() => this.show = false, 4000);
                     @elseif(session('info'))
-                        messageType = 'info';
-                        message = '{{ session('info') }}';
-                        setTimeout(() => show = false, 4000); @endif" x-show="show && message"
-            x-transition:enter="transition ease-out duration-300"
+                        this.messageType = 'info';
+                        this.message = @js(session('info'));
+                        setTimeout(() => this.show = false, 4000); @endif
+            }
+        }" x-show="show && message" x-transition:enter="transition ease-out duration-300"
             x-transition:enter-start="opacity-0 transform scale-90"
             x-transition:enter-end="opacity-100 transform scale-100"
             x-transition:leave="transition ease-in duration-200"
