@@ -97,6 +97,7 @@
                         </div>
                         <!-- Remove button for other users -->
                         <button x-show="!isCurrentUser(user.id)" type="button" @click="removeUser(user.id)"
+                            :data-test="'remove-user-' + user.id"
                             class="p-1 text-red-400 hover:text-red-600 dark:text-red-300 dark:hover:text-red-100 transition-colors rounded-full hover:bg-red-50 dark:hover:bg-red-900/20">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

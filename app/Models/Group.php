@@ -43,8 +43,6 @@ class Group extends Model
         return $this->hasMany(MapMarker::class);
     }
 
-
-
     public function calculateUserDebts()
     {
         $debts = [];

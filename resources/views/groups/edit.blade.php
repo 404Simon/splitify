@@ -8,7 +8,7 @@
             <x-user-selector :selected-users="$selectedUsers" name="members" label="Group Members" :required="true" />
             <div
                 class="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 py-6 border-y border-gray-200 dark:border-gray-700">
-                <x-enhanced-button variant="secondary" :href="route('groups.show', $group)">
+                <x-enhanced-button variant="secondary" :href="route('groups.index', $group)">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M6 18L18 6M6 6l12 12" />
