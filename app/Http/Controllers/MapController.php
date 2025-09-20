@@ -32,7 +32,7 @@ class MapController extends Controller
 
     public function index(Group $group)
     {
-        $mapMarkers = MapMarker::where('group_id', $group->id)->get();
+        $mapMarkers = $group->mapMarkers;
 
         return view('map.index', [
             'group' => $group,
