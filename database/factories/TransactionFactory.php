@@ -25,14 +25,14 @@ class TransactionFactory extends Factory
             'recipient_id' => User::factory(),
             'amount' => fake()->randomFloat(2, 1, 100),
             'description' => fake()->optional()->randomElement([
-                'Payment for dinner',
-                'Settling grocery bill',
-                'Coffee money',
-                'Movie ticket reimbursement',
-                'Gas money',
-                'Lunch payment',
-                'Shared taxi fare',
-                'Utilities settlement',
+                'PayPal',
+                'Venmo',
+                'Cash',
+                'Bank transfer',
+                'Zelle',
+                'Apple Pay',
+                'Cash App',
+                'Wire transfer',
             ]),
         ];
     }

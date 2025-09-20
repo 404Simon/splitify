@@ -43,20 +43,7 @@ class Group extends Model
         return $this->hasMany(MapMarker::class);
     }
 
-    protected static function boot()
-    {
-        parent::boot();
 
-        static::deleting(function ($group) {
-            // Delete all related data when group is deleted
-            $group->sharedDebts()->delete();
-            $group->transactions()->delete();
-            $group->invites()->delete();
-            $group->recurringSharedDebts()->delete();
-            $group->mapMarkers()->delete();
-            $group->users()->detach();
-        });
-    }
 
     public function calculateUserDebts()
     {
