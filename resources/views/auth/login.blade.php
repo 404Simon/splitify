@@ -60,7 +60,7 @@
     </form>
 
     <div class="mt-4 text-center">
-        <a href="{{ route('register') }}"
+        <a href="{{ route('register') }}" data-test="register"
             class="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100">
             {{ __('Don\'t have an account? Register here.') }}
         </a>

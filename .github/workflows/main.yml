@@ -28,7 +28,7 @@ jobs:
 
       - name: Install Node.js dependencies and build assets
         run: |
-          npm install
+          npm install --omit=dev
           npm run build
 
       - name: Prepare deployment directory
