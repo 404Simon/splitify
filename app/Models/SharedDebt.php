@@ -13,6 +13,13 @@ class SharedDebt extends Model
 
     protected $fillable = ['group_id', 'created_by', 'name', 'amount', 'recurring_shared_debt_id'];
 
+    protected function casts(): array
+    {
+        return [
+            'amount' => 'float',
+        ];
+    }
+
     public function group(): BelongsTo
     {
         return $this->belongsTo(Group::class);

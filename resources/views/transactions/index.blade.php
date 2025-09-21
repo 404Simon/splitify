@@ -68,21 +68,23 @@
                                             </svg>
                                             Edit
                                         </x-enhanced-button>
-                                        <form
+                                        <form id="deleteTransactionForm-{{ $transaction->id }}"
                                             action="{{ route('groups.transactions.destroy', ['group' => $group->id, 'transaction' => $transaction->id]) }}"
                                             method="POST" class="inline">
                                             @csrf
                                             @method('DELETE')
-                                            <x-enhanced-button type="submit" variant="danger" size="sm"
-                                                onclick="return confirm('Are you sure you want to delete this transaction?')">
-                                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                </svg>
-                                                Delete
-                                            </x-enhanced-button>
+                                            <div x-data>
+                                                <x-enhanced-button type="button" variant="danger" size="sm"
+                                                    x-on:click="$dispatch('open-modal', 'delete-transaction-modal-{{ $transaction->id }}')">
+                                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                    </svg>
+                                                    Delete
+                                                </x-enhanced-button>
+                                            </div>
                                         </form>
                                     </div>
                                 @endif
@@ -93,4 +95,17 @@
             @endif
         </div>
     </div>
+
+    <!-- Delete Confirmation Modals for Transactions -->
+    @if (!$transactions->isEmpty())
+        @foreach ($transactions as $transaction)
+            @if ($transaction->payer_id === Auth::id())
+                <x-confirmation-modal name="delete-transaction-modal-{{ $transaction->id }}" 
+                    title="Delete {{ $transaction->description ?? 'Transaction' }}"
+                    description="Are you sure you want to delete this transaction? This action cannot be undone."
+                    confirm-text="Confirm Delete" cancel-text="Cancel" variant="danger" 
+                    form-id="deleteTransactionForm-{{ $transaction->id }}" />
+            @endif
+        @endforeach
+    @endif
 </x-app-layout>

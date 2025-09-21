@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Transaction extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'group_id',
         'payer_id',
@@ -14,6 +17,13 @@ class Transaction extends Model
         'amount',
         'description',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'amount' => 'float',
+        ];
+    }
 
     public function group(): BelongsTo
     {
