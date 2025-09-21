@@ -109,18 +109,6 @@ class SharedDebtFactory extends Factory
     }
 
     /**
-     * Configure the model factory with users.
-     */
-    public function configure(): static
-    {
-        return $this->afterCreating(function (SharedDebt $debt) {
-            // Attach some users to the shared debt
-            $users = $debt->group->users()->inRandomOrder()->limit(fake()->numberBetween(2, 4))->get();
-            $debt->users()->attach($users->pluck('id'));
-        });
-    }
-
-    /**
      * Indicate that the shared debt should have specific users.
      */
     public function withUsers(array $userIds): static
@@ -139,5 +127,13 @@ class SharedDebtFactory extends Factory
             $users = $debt->group->users;
             $debt->users()->attach($users->pluck('id'));
         });
+    }
+
+    /**
+     * Indicate that the shared debt should not auto-attach users.
+     */
+    public function withoutUsers(): static
+    {
+        return $this;
     }
 }

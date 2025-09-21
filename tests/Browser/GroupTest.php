@@ -52,7 +52,7 @@ test('user can delete his group', function () {
 
 test('user cannot edit group he doesnt have admin privileges in', function () {
     $user = User::factory()->create();
-    $group = Group::factory()->withUsers()->create();
+    $group = Group::factory()->withUsers()->create(['name' => 'Norway']);
     $group->users()->attach($user);
 
     $this->actingAs($user);

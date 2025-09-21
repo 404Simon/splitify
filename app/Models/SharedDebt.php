@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class SharedDebt extends Model
 {
+    use HasFactory;
+
     protected $fillable = ['group_id', 'created_by', 'name', 'amount', 'recurring_shared_debt_id'];
 
     public function group(): BelongsTo
@@ -38,7 +41,7 @@ class SharedDebt extends Model
         return $users->map(function ($user) use ($sharePerUser) {
             return [
                 'user' => $user,
-                'amount' => number_format($sharePerUser, 2),
+                'amount' => $sharePerUser,
             ];
         });
     }
