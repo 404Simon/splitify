@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Factories;
 
 use App\Models\Group;
@@ -10,7 +12,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\RecurringSharedDebt>
  */
-class RecurringSharedDebtFactory extends Factory
+final class RecurringSharedDebtFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -48,7 +50,7 @@ class RecurringSharedDebtFactory extends Factory
      */
     public function forGroup(Group $group): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'group_id' => $group->id,
         ]);
     }
@@ -58,7 +60,7 @@ class RecurringSharedDebtFactory extends Factory
      */
     public function createdBy(User $user): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'created_by' => $user->id,
         ]);
     }
@@ -68,7 +70,7 @@ class RecurringSharedDebtFactory extends Factory
      */
     public function active(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'is_active' => true,
         ]);
     }
@@ -78,7 +80,7 @@ class RecurringSharedDebtFactory extends Factory
      */
     public function inactive(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'is_active' => false,
         ]);
     }
@@ -88,7 +90,7 @@ class RecurringSharedDebtFactory extends Factory
      */
     public function monthly(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'frequency' => 'monthly',
         ]);
     }
@@ -98,7 +100,7 @@ class RecurringSharedDebtFactory extends Factory
      */
     public function weekly(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'frequency' => 'weekly',
         ]);
     }
@@ -108,7 +110,7 @@ class RecurringSharedDebtFactory extends Factory
      */
     public function daily(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'frequency' => 'daily',
         ]);
     }
@@ -118,7 +120,7 @@ class RecurringSharedDebtFactory extends Factory
      */
     public function yearly(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'frequency' => 'yearly',
         ]);
     }
@@ -128,7 +130,7 @@ class RecurringSharedDebtFactory extends Factory
      */
     public function readyForGeneration(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'is_active' => true,
             'next_generation_date' => now()->subDay(),
         ]);
@@ -139,7 +141,7 @@ class RecurringSharedDebtFactory extends Factory
      */
     public function expired(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'end_date' => now()->subDay(),
         ]);
     }
@@ -149,7 +151,7 @@ class RecurringSharedDebtFactory extends Factory
      */
     public function configure(): static
     {
-        return $this->afterCreating(function (RecurringSharedDebt $debt) {
+        return $this->afterCreating(function (RecurringSharedDebt $debt): void {
             // Attach some users to the recurring debt
             $users = $debt->group->users()->inRandomOrder()->limit(fake()->numberBetween(2, 4))->get();
             $debt->users()->attach($users->pluck('id'));
@@ -161,7 +163,7 @@ class RecurringSharedDebtFactory extends Factory
      */
     public function withUsers(array $userIds): static
     {
-        return $this->afterCreating(function (RecurringSharedDebt $debt) use ($userIds) {
+        return $this->afterCreating(function (RecurringSharedDebt $debt) use ($userIds): void {
             $debt->users()->attach($userIds);
         });
     }

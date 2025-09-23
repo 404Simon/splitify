@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -11,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('recurring_shared_debts', function (Blueprint $table) {
+        Schema::create('recurring_shared_debts', function (Blueprint $table): void {
             $table->id();
             $table->foreignId('group_id')->constrained()->onDelete('cascade');
             $table->foreignId('created_by')->constrained('users')->onDelete('cascade');
@@ -26,7 +28,7 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        Schema::create('recurring_shared_debt_user', function (Blueprint $table) {
+        Schema::create('recurring_shared_debt_user', function (Blueprint $table): void {
             $table->id();
             $table->foreignId('recurring_shared_debt_id')->constrained()->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');

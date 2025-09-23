@@ -1,16 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Policies;
 
 use App\Models\SharedDebt;
 use App\Models\User;
 
-class SharedDebtPolicy
+final class SharedDebtPolicy
 {
     /**
      * Determine whether the user can view any models.
      */
-    public function viewAny(User $user): bool
+    public function viewAny(): bool
     {
         return false;
     }
@@ -18,7 +20,7 @@ class SharedDebtPolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, SharedDebt $sharedDebt): bool
+    public function view(): bool
     {
         return false;
     }
@@ -26,7 +28,7 @@ class SharedDebtPolicy
     /**
      * Determine whether the user can create models.
      */
-    public function create(User $user): bool
+    public function create(): bool
     {
         return false;
     }
@@ -50,7 +52,7 @@ class SharedDebtPolicy
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(User $user, SharedDebt $sharedDebt): bool
+    public function restore(): bool
     {
         return false;
     }
@@ -58,7 +60,7 @@ class SharedDebtPolicy
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(User $user, SharedDebt $sharedDebt): bool
+    public function forceDelete(): bool
     {
         return false;
     }

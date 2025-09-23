@@ -1,16 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Policies;
 
 use App\Models\RecurringSharedDebt;
 use App\Models\User;
 
-class RecurringSharedDebtPolicy
+final class RecurringSharedDebtPolicy
 {
     /**
      * Determine whether the user can view any models.
      */
-    public function viewAny(User $user): bool
+    public function viewAny(): bool
     {
         return true;
     }
@@ -26,7 +28,7 @@ class RecurringSharedDebtPolicy
     /**
      * Determine whether the user can create models.
      */
-    public function create(User $user): bool
+    public function create(): bool
     {
         return true;
     }
@@ -52,7 +54,7 @@ class RecurringSharedDebtPolicy
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(User $user, RecurringSharedDebt $recurringSharedDebt): bool
+    public function restore(): bool
     {
         return false;
     }
@@ -60,7 +62,7 @@ class RecurringSharedDebtPolicy
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(User $user, RecurringSharedDebt $recurringSharedDebt): bool
+    public function forceDelete(): bool
     {
         return false;
     }

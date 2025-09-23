@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Factories;
 
 use App\Models\Group;
@@ -11,7 +13,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\SharedDebt>
  */
-class SharedDebtFactory extends Factory
+final class SharedDebtFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -45,7 +47,7 @@ class SharedDebtFactory extends Factory
      */
     public function forGroup(Group $group): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'group_id' => $group->id,
         ]);
     }
@@ -55,7 +57,7 @@ class SharedDebtFactory extends Factory
      */
     public function createdBy(User $user): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'created_by' => $user->id,
         ]);
     }
@@ -65,7 +67,7 @@ class SharedDebtFactory extends Factory
      */
     public function fromRecurring(RecurringSharedDebt $recurringDebt): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'group_id' => $recurringDebt->group_id,
             'created_by' => $recurringDebt->created_by,
             'name' => $recurringDebt->name,
@@ -79,7 +81,7 @@ class SharedDebtFactory extends Factory
      */
     public function largeExpense(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'amount' => fake()->randomFloat(2, 100, 1000),
             'name' => fake()->randomElement([
                 'House Rent',
@@ -96,7 +98,7 @@ class SharedDebtFactory extends Factory
      */
     public function smallExpense(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'amount' => fake()->randomFloat(2, 1, 25),
             'name' => fake()->randomElement([
                 'Coffee',
@@ -113,7 +115,7 @@ class SharedDebtFactory extends Factory
      */
     public function withUsers(array $userIds): static
     {
-        return $this->afterCreating(function (SharedDebt $debt) use ($userIds) {
+        return $this->afterCreating(function (SharedDebt $debt) use ($userIds): void {
             $debt->users()->attach($userIds);
         });
     }
@@ -123,7 +125,7 @@ class SharedDebtFactory extends Factory
      */
     public function splitBetweenAllMembers(): static
     {
-        return $this->afterCreating(function (SharedDebt $debt) {
+        return $this->afterCreating(function (SharedDebt $debt): void {
             $users = $debt->group->users;
             $debt->users()->attach($users->pluck('id'));
         });

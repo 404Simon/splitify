@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Factories;
 
 use App\Models\Group;
@@ -10,7 +12,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Transaction>
  */
-class TransactionFactory extends Factory
+final class TransactionFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -42,7 +44,7 @@ class TransactionFactory extends Factory
      */
     public function forGroup(Group $group): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'group_id' => $group->id,
         ]);
     }
@@ -52,7 +54,7 @@ class TransactionFactory extends Factory
      */
     public function paidBy(User $user): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'payer_id' => $user->id,
         ]);
     }
@@ -62,7 +64,7 @@ class TransactionFactory extends Factory
      */
     public function paidTo(User $user): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'recipient_id' => $user->id,
         ]);
     }
@@ -72,7 +74,7 @@ class TransactionFactory extends Factory
      */
     public function between(User $payer, User $recipient): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'payer_id' => $payer->id,
             'recipient_id' => $recipient->id,
         ]);
@@ -83,7 +85,7 @@ class TransactionFactory extends Factory
      */
     public function largeAmount(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'amount' => fake()->randomFloat(2, 50, 500),
         ]);
     }
@@ -93,7 +95,7 @@ class TransactionFactory extends Factory
      */
     public function smallAmount(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'amount' => fake()->randomFloat(2, 1, 20),
         ]);
     }
@@ -103,7 +105,7 @@ class TransactionFactory extends Factory
      */
     public function configure(): static
     {
-        return $this->afterMaking(function (Transaction $transaction) {
+        return $this->afterMaking(function (Transaction $transaction): void {
             // Ensure both payer and recipient exist and belong to the group
             if ($transaction->group_id && $transaction->payer_id && $transaction->recipient_id) {
                 $group = $transaction->group;
@@ -125,7 +127,7 @@ class TransactionFactory extends Factory
      */
     public function betweenGroupMembers(): static
     {
-        return $this->afterMaking(function (Transaction $transaction) {
+        return $this->afterMaking(function (Transaction $transaction): void {
             $groupUsers = $transaction->group->users()->inRandomOrder()->limit(2)->get();
 
             if ($groupUsers->count() >= 2) {

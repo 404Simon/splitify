@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -7,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Group extends Model
+final class Group extends Model
 {
     use HasFactory;
 
@@ -43,7 +45,10 @@ class Group extends Model
         return $this->hasMany(MapMarker::class);
     }
 
-    public function calculateUserDebts()
+    /**
+     * @return non-empty-array<(float | int)>[]
+     */
+    public function calculateUserDebts(): array
     {
         $debts = [];
 
@@ -53,7 +58,7 @@ class Group extends Model
             $individualDebts = $debt->calculateIndividualDebts();
 
             foreach ($individualDebts as $userId => $amount) {
-                if ($userId == $creatorId) {
+                if ($userId === $creatorId) {
                     continue;
                 }
 

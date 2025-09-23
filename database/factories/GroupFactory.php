@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Factories;
 
 use App\Models\Group;
@@ -9,7 +11,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Group>
  */
-class GroupFactory extends Factory
+final class GroupFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -29,7 +31,7 @@ class GroupFactory extends Factory
      */
     public function createdBy(User $user): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'created_by' => $user->id,
         ]);
     }
@@ -39,7 +41,7 @@ class GroupFactory extends Factory
      */
     public function configure(): static
     {
-        return $this->afterCreating(function (Group $group) {
+        return $this->afterCreating(function (Group $group): void {
             // Attach the creator to the group
             $group->users()->attach($group->created_by);
         });
@@ -50,7 +52,7 @@ class GroupFactory extends Factory
      */
     public function withUsers(int $count = 3): static
     {
-        return $this->afterCreating(function (Group $group) use ($count) {
+        return $this->afterCreating(function (Group $group) use ($count): void {
             $users = User::factory()->count($count)->create();
             $group->users()->attach($users->pluck('id'));
         });

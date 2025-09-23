@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
 
-class GeolocationService
+final class GeolocationService
 {
-    protected string $baseUrl = 'https://nominatim.openstreetmap.org/search';
+    private string $baseUrl = 'https://nominatim.openstreetmap.org/search';
 
     public function getCoordinates(string $address): ?array
     {

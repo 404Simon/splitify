@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Feature;
 
 use App\Models\Group;
@@ -366,5 +368,5 @@ test('invite uuid generation works correctly', function () {
 
     $invite = Invite::where('name', 'UUID Test')->first();
     expect($invite->uuid)->not->toBeNull();
-    expect(strlen($invite->uuid))->toBe(36); // Standard UUID length
+    expect(mb_strlen($invite->uuid))->toBe(36); // Standard UUID length
 });

@@ -1,13 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\View\Components;
 
-use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\View\Component;
 
-class EmojiSelector extends Component
+final class EmojiSelector extends Component
 {
     public function __construct(
         public string $defaultEmoji = '😀',
@@ -17,11 +18,9 @@ class EmojiSelector extends Component
         $this->value = $value ?? $defaultEmoji;
     }
 
-    public function render(): View|Closure|string
+    public function render(): View
     {
-        $emojiData = Cache::remember('emoji_data', 60 * 60 * 24, function () {
-            return json_decode(file_get_contents(public_path('emoji.json')), true);
-        });
+        $emojiData = Cache::remember('emoji_data', 60 * 60 * 24, fn (): mixed => json_decode(file_get_contents(public_path('emoji.json')), true));
 
         $categoryEmojis = [
             'all' => '🔍',
@@ -40,10 +39,10 @@ class EmojiSelector extends Component
         ]);
 
         $categories = $categories->merge(
-            collect($emojiData)->keys()->map(function ($category) use ($categoryEmojis) {
-                $categoryId = strtolower(str_replace('-', '_', $category));
+            collect($emojiData)->keys()->map(function ($category) use ($categoryEmojis): array {
+                $categoryId = mb_strtolower(str_replace('-', '_', $category));
                 $categoryName = str_replace('-', ' & ', $category);
-                $emoji = $categoryEmojis[strtolower($category)] ?? '📋';
+                $emoji = $categoryEmojis[mb_strtolower($category)] ?? '📋';
 
                 return [
                     'id' => $categoryId,

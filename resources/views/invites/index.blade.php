@@ -63,8 +63,8 @@
                             <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
                                 <div class="flex items-center space-x-2">
                                     <div class="flex-1 min-w-0">
-                                        <div class="text-gray-700 dark:text-gray-300 text-sm font-mono break-all"
-                                             id="inviteLink-{{ $invite->id }}" x-ref="inviteLinkText">
+                                         <div class="text-gray-700 dark:text-gray-300 text-sm font-mono break-all"
+                                             id="inviteLink-{{ $invite->uuid }}" x-ref="inviteLinkText">
                                             {{ route('invites.show', $invite->uuid) }}
                                         </div>
                                     </div>

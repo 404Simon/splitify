@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Models\Group;
@@ -9,7 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\View\View;
 
-class RecurringSharedDebtController extends Controller
+final class RecurringSharedDebtController extends Controller
 {
     public function index(Group $group): View
     {
@@ -19,14 +21,14 @@ class RecurringSharedDebtController extends Controller
             ->latest()
             ->get();
 
-        return view('recurringSharedDebts.index', compact('group', 'recurringDebts'));
+        return view('recurringSharedDebts.index', ['group' => $group, 'recurringDebts' => $recurringDebts]);
     }
 
     public function create(Group $group): View
     {
         $this->authorize('view', $group);
 
-        return view('recurringSharedDebts.create', compact('group'));
+        return view('recurringSharedDebts.create', ['group' => $group]);
     }
 
     public function store(Request $request, Group $group): RedirectResponse
@@ -76,14 +78,14 @@ class RecurringSharedDebtController extends Controller
     {
         $this->authorize('view', $recurringDebt);
 
-        return view('recurringSharedDebts.show', compact('group', 'recurringDebt'));
+        return view('recurringSharedDebts.show', ['group' => $group, 'recurringDebt' => $recurringDebt]);
     }
 
     public function edit(Group $group, RecurringSharedDebt $recurringDebt): View
     {
         $this->authorize('update', $recurringDebt);
 
-        return view('recurringSharedDebts.edit', compact('group', 'recurringDebt'));
+        return view('recurringSharedDebts.edit', ['group' => $group, 'recurringDebt' => $recurringDebt]);
     }
 
     public function update(Request $request, Group $group, RecurringSharedDebt $recurringDebt): RedirectResponse
@@ -172,7 +174,7 @@ class RecurringSharedDebtController extends Controller
     private function validateGroupMembers(array $memberIds, Group $group): Collection
     {
         return collect($memberIds)->filter(
-            fn ($memberId) => ! $group->users->contains('id', $memberId)
+            fn ($memberId): bool => ! $group->users->contains('id', $memberId)
         );
     }
 }

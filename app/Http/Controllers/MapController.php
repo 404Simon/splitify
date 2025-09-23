@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Models\Group;
@@ -8,16 +10,11 @@ use App\Services\GeolocationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
-class MapController extends Controller
+final class MapController extends Controller
 {
-    protected GeolocationService $geolocationService;
+    public function __construct(private readonly GeolocationService $geolocationService) {}
 
-    public function __construct(GeolocationService $geolocationService)
-    {
-        $this->geolocationService = $geolocationService;
-    }
-
-    public function displayMap(Group $group)
+    public function displayMap(Group $group): \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
     {
         $markers = MapMarker::where('group_id', $group->id)->get();
 
@@ -27,10 +24,10 @@ class MapController extends Controller
             $center = ['lat' => $markers->avg('lat'), 'lon' => $markers->avg('lon')];
         }
 
-        return view('map.display', compact('group', 'markers', 'center'));
+        return view('map.display', ['group' => $group, 'markers' => $markers, 'center' => $center]);
     }
 
-    public function index(Group $group)
+    public function index(Group $group): \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
     {
         $mapMarkers = $group->mapMarkers;
 
@@ -40,9 +37,9 @@ class MapController extends Controller
         ]);
     }
 
-    public function create(Group $group)
+    public function create(Group $group): \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
     {
-        return view('map.create', compact('group'));
+        return view('map.create', ['group' => $group]);
     }
 
     public function store(Request $request, Group $group)
@@ -60,7 +57,7 @@ class MapController extends Controller
             return redirect()->back()->with('error', 'Could not find address..');
         }
 
-        $marker = MapMarker::create([
+        MapMarker::create([
             'group_id' => $group->id,
             'created_by' => auth()->id(),
             'name' => $validated['name'],
@@ -74,16 +71,16 @@ class MapController extends Controller
         return redirect()->route('groups.mapMarkers.index', $group->id)->with('success', 'Map marker created successfully.');
     }
 
-    public function edit(Group $group, MapMarker $mapMarker)
+    public function edit(Group $group, MapMarker $mapMarker): \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
     {
         Gate::authorize('update', $mapMarker);
 
-        return view('map.edit', compact('group', 'mapMarker'));
+        return view('map.edit', ['group' => $group, 'mapMarker' => $mapMarker]);
     }
 
-    public function show(Group $group, MapMarker $mapMarker)
+    public function show(Group $group, MapMarker $mapMarker): \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
     {
-        return view('map.show', compact('group', 'mapMarker'));
+        return view('map.show', ['group' => $group, 'mapMarker' => $mapMarker]);
     }
 
     public function update(Request $request, Group $group, MapMarker $mapMarker)

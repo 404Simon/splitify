@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Console\Commands;
 
 use App\Models\RecurringSharedDebt;
+use Exception;
 use Illuminate\Console\Command;
 
-class GenerateRecurringSharedDebts extends Command
+final class GenerateRecurringSharedDebts extends Command
 {
     /**
      * The name and signature of the console command.
@@ -24,13 +27,13 @@ class GenerateRecurringSharedDebts extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): int
     {
         $this->info('Checking for recurring shared debts to generate...');
 
         $recurringDebts = RecurringSharedDebt::where('is_active', true)
             ->where('next_generation_date', '<=', now())
-            ->where(function ($query) {
+            ->where(function ($query): void {
                 $query->whereNull('end_date')
                     ->orWhere('end_date', '>=', now());
             })
@@ -52,7 +55,7 @@ class GenerateRecurringSharedDebts extends Command
                     $generatedCount++;
 
                     $this->info("Generated shared debt '{$sharedDebt->name}' from recurring debt ID {$recurringDebt->id}");
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     $this->error("Failed to generate shared debt from recurring debt ID {$recurringDebt->id}: {$e->getMessage()}");
                 }
             }

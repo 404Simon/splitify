@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Factories;
 
 use App\Models\Group;
@@ -10,7 +12,7 @@ use Illuminate\Support\Str;
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Invite>
  */
-class InviteFactory extends Factory
+final class InviteFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -33,7 +35,7 @@ class InviteFactory extends Factory
      */
     public function reusable(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'is_reusable' => true,
         ]);
     }
@@ -43,7 +45,7 @@ class InviteFactory extends Factory
      */
     public function singleUse(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'is_reusable' => false,
         ]);
     }
@@ -53,7 +55,7 @@ class InviteFactory extends Factory
      */
     public function expired(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'duration_days' => 1,
             'created_at' => now()->subDays(2),
         ]);
@@ -64,7 +66,7 @@ class InviteFactory extends Factory
      */
     public function validFor(int $days): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'duration_days' => $days,
         ]);
     }
@@ -74,7 +76,7 @@ class InviteFactory extends Factory
      */
     public function forGroup(Group $group): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'group_id' => $group->id,
         ]);
     }

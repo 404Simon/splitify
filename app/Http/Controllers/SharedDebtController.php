@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Models\Group;
@@ -9,7 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\View\View;
 
-class SharedDebtController extends Controller
+final class SharedDebtController extends Controller
 {
     public function index(Group $group): View
     {
@@ -19,14 +21,14 @@ class SharedDebtController extends Controller
             ->latest()
             ->get();
 
-        return view('sharedDebts.index', compact('group', 'sharedDebts'));
+        return view('sharedDebts.index', ['group' => $group, 'sharedDebts' => $sharedDebts]);
     }
 
     public function create(Group $group): View
     {
         $this->authorize('view', $group);
 
-        return view('sharedDebts.create', compact('group'));
+        return view('sharedDebts.create', ['group' => $group]);
     }
 
     public function store(Request $request, Group $group): RedirectResponse
@@ -67,7 +69,7 @@ class SharedDebtController extends Controller
     {
         $this->authorize('update', $sharedDebt);
 
-        return view('sharedDebts.edit', compact('group', 'sharedDebt'));
+        return view('sharedDebts.edit', ['group' => $group, 'sharedDebt' => $sharedDebt]);
     }
 
     public function update(Request $request, Group $group, SharedDebt $sharedDebt): RedirectResponse
@@ -116,7 +118,7 @@ class SharedDebtController extends Controller
     private function validateGroupMembers(array $memberIds, Group $group): Collection
     {
         return collect($memberIds)->filter(
-            fn ($memberId) => ! $group->users->contains('id', $memberId)
+            fn ($memberId): bool => ! $group->users->contains('id', $memberId)
         );
     }
 }

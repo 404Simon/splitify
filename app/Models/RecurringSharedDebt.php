@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use Carbon\Carbon;
@@ -8,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class RecurringSharedDebt extends Model
+final class RecurringSharedDebt extends Model
 {
     protected $fillable = [
         'group_id',
@@ -100,12 +102,10 @@ class RecurringSharedDebt extends Model
         $users = $this->users;
         $sharePerUser = $this->amount / $users->count();
 
-        return $users->map(function ($user) use ($sharePerUser) {
-            return [
-                'user' => $user,
-                'amount' => number_format($sharePerUser, 2),
-            ];
-        });
+        return $users->map(fn ($user): array => [
+            'user' => $user,
+            'amount' => number_format($sharePerUser, 2),
+        ]);
     }
 
     public function getFrequencyLabelAttribute(): string

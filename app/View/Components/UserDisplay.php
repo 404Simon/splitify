@@ -1,29 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\View\Components;
 
 use App\Models\User;
-use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\Component;
 
-class UserDisplay extends Component
+final class UserDisplay extends Component
 {
-    public User $user;
-
-    public bool $isGroupAdmin;
-
     /**
      * Create a new component instance.
      */
-    public function __construct(User $user, bool $isGroupAdmin = false)
-    {
-        $this->user = $user;
-        $this->isGroupAdmin = $isGroupAdmin;
-    }
+    public function __construct(public User $user, public bool $isGroupAdmin = false) {}
 
-    public function isCurrentUser()
+    public function isCurrentUser(): bool
     {
         return $this->user->id === Auth::id();
     }
@@ -31,7 +24,7 @@ class UserDisplay extends Component
     /**
      * Get the view / contents that represent the component.
      */
-    public function render(): View|Closure|string
+    public function render(): View
     {
         return view('components.user-display');
     }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Models\Group;
@@ -8,7 +10,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
-class TransactionController extends Controller
+final class TransactionController extends Controller
 {
     public function index(Group $group): View
     {
@@ -18,7 +20,7 @@ class TransactionController extends Controller
             ->latest()
             ->get();
 
-        return view('transactions.index', compact('group', 'transactions'));
+        return view('transactions.index', ['group' => $group, 'transactions' => $transactions]);
     }
 
     public function create(Group $group): View
@@ -28,7 +30,7 @@ class TransactionController extends Controller
         $otherMembers = $group->users->where('id', '!=', auth()->id());
         $preselectedRecipient = $otherMembers->count() === 1 ? $otherMembers->first()->id : null;
 
-        return view('transactions.create', compact('group', 'preselectedRecipient'));
+        return view('transactions.create', ['group' => $group, 'preselectedRecipient' => $preselectedRecipient]);
     }
 
     public function store(Request $request, Group $group): RedirectResponse
@@ -41,7 +43,7 @@ class TransactionController extends Controller
             'description' => 'nullable|string|max:255',
         ]);
 
-        if (! $this->isUserInGroup($validated['recipient_id'], $group)) {
+        if (! $group->users()->where('user_id', $validated['recipient_id'])->exists()) {
             return redirect()
                 ->back()
                 ->withErrors(['recipient_id' => 'The selected recipient is not part of this group.'])
@@ -66,7 +68,7 @@ class TransactionController extends Controller
         $otherMembers = $group->users->where('id', '!=', auth()->id());
         $preselectedRecipient = $otherMembers->count() === 1 ? $otherMembers->first()->id : null;
 
-        return view('transactions.edit', compact('group', 'transaction', 'preselectedRecipient'));
+        return view('transactions.edit', ['group' => $group, 'transaction' => $transaction, 'preselectedRecipient' => $preselectedRecipient]);
     }
 
     public function update(Request $request, Group $group, Transaction $transaction): RedirectResponse
@@ -79,7 +81,7 @@ class TransactionController extends Controller
             'description' => 'nullable|string|max:255',
         ]);
 
-        if (! $this->isUserInGroup($validated['recipient_id'], $group)) {
+        if (! $group->users()->where('user_id', $validated['recipient_id'])->exists()) {
             return redirect()
                 ->back()
                 ->withErrors(['recipient_id' => 'The selected recipient is not part of this group.'])
@@ -102,10 +104,5 @@ class TransactionController extends Controller
         return redirect()
             ->back()
             ->with('success', 'Transaction deleted successfully!');
-    }
-
-    private function isUserInGroup(int $userId, Group $group): bool
-    {
-        return $group->users->contains('id', $userId);
     }
 }

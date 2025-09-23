@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Factories;
 
 use App\Models\Group;
@@ -9,7 +11,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\MapMarker>
  */
-class MapMarkerFactory extends Factory
+final class MapMarkerFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -35,7 +37,7 @@ class MapMarkerFactory extends Factory
      */
     public function forGroup(Group $group): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'group_id' => $group->id,
         ]);
     }
@@ -45,7 +47,7 @@ class MapMarkerFactory extends Factory
      */
     public function createdBy(User $user): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'created_by' => $user->id,
         ]);
     }
@@ -55,7 +57,7 @@ class MapMarkerFactory extends Factory
      */
     public function restaurant(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'emoji' => '🍽️',
             'name' => fake()->company().' Restaurant',
             'description' => 'A great place to eat',
@@ -67,7 +69,7 @@ class MapMarkerFactory extends Factory
      */
     public function coffeeShop(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'emoji' => '☕',
             'name' => fake()->company().' Coffee',
             'description' => 'Perfect coffee spot',
@@ -79,7 +81,7 @@ class MapMarkerFactory extends Factory
      */
     public function atLocation(float $lat, float $lon): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'lat' => $lat,
             'lon' => $lon,
         ]);

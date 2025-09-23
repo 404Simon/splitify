@@ -1,19 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Policies;
 
 use App\Models\MapMarker;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
-class MapMarkerPolicy
+final class MapMarkerPolicy
 {
     use HandlesAuthorization;
 
     /**
      * Determine whether the user can view any models.
      */
-    public function viewAny(User $user): bool
+    public function viewAny(): bool
     {
         return true;
     }
@@ -30,7 +32,7 @@ class MapMarkerPolicy
     /**
      * Determine whether the user can create models.
      */
-    public function create(User $user): bool
+    public function create(): bool
     {
         return true;
     }
@@ -46,11 +48,7 @@ class MapMarkerPolicy
         }
 
         // Allow if user is the admin (creator) of the group
-        if ($user->id === $mapMarker->group->created_by) {
-            return true;
-        }
-
-        return false;
+        return $user->id === $mapMarker->group->created_by;
     }
 
     /**

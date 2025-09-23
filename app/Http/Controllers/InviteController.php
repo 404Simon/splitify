@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Models\Group;
@@ -8,18 +10,16 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
-class InviteController extends Controller
+final class InviteController extends Controller
 {
     public function index(Request $request, Group $group): View
     {
-        $invites = $group->invites();
-
-        return view('invites.index', compact('group'));
+        return view('invites.index', ['group' => $group]);
     }
 
-    public function create(Group $group)
+    public function create(Group $group): \Illuminate\Contracts\View\View|\Illuminate\Contracts\View\Factory
     {
-        return view('invites.create', compact('group'));
+        return view('invites.create', ['group' => $group]);
     }
 
     public function store(Request $request, Group $group)
@@ -35,31 +35,14 @@ class InviteController extends Controller
             $validated['is_reusable'] = false;
         }
 
-        $invite = Invite::create($validated);
+        Invite::create($validated);
 
-        return redirect()->route('groups.invites.index', compact('group'))->with('success', 'Invite created successfully!');
-    }
-
-    private function checkInvite(Invite $invite)
-    {
-        if (! $invite->isValid()) {
-            return redirect()->back()->with('error', 'The invite is not valid or has expired.');
-        }
-
-        $group = $invite->group;
-        if (! $group) {
-            return redirect()->back()->with('error', 'The group associated with this invite was not found.');
-        }
-
-        $user = auth()->user();
-        if ($group->users()->where('user_id', $user->id)->exists()) {
-            return redirect()->back()->with('error', 'You are already a member of this group.');
-        }
+        return redirect()->route('groups.invites.index', ['group' => $group])->with('success', 'Invite created successfully!');
     }
 
     public function show(Request $request, string $uuid)
     {
-        if ($uuid) {
+        if ($uuid !== '' && $uuid !== '0') {
             session(['invite_token' => $uuid]);
         }
 
@@ -67,7 +50,7 @@ class InviteController extends Controller
             $invite = Invite::findOrFail($uuid);
             $this->checkInvite($invite);
 
-            return view('invites.show', compact('invite'));
+            return view('invites.show', ['invite' => $invite]);
         }
 
         return redirect()->guest(route('login'))->with('message', 'You were invited to join a group in Splitify. Please log in or create an Account to accept it.');
@@ -115,6 +98,25 @@ class InviteController extends Controller
     {
         $invite->delete();
 
-        return redirect()->route('groups.invites.index', compact('group'))->with('success', 'Invite deleted successfully!');
+        return redirect()->route('groups.invites.index', ['group' => $group])->with('success', 'Invite deleted successfully!');
+    }
+
+    private function checkInvite(Invite $invite)
+    {
+        if (! $invite->isValid()) {
+            return redirect()->back()->with('error', 'The invite is not valid or has expired.');
+        }
+
+        $group = $invite->group;
+        if (! $group) {
+            return redirect()->back()->with('error', 'The group associated with this invite was not found.');
+        }
+
+        $user = auth()->user();
+        if ($group->users()->where('user_id', $user->id)->exists()) {
+            return redirect()->back()->with('error', 'You are already a member of this group.');
+        }
+
+        return null;
     }
 }

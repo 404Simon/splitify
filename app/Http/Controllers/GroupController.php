@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Models\Group;
@@ -9,20 +11,20 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\View\View;
 
-class GroupController extends Controller
+final class GroupController extends Controller
 {
     public function index(Request $request): View
     {
         $groups = $request->user()->groups()->get();
 
-        return view('groups.index', compact('groups'));
+        return view('groups.index', ['groups' => $groups]);
     }
 
     public function create(Request $request): View
     {
         $users = User::query()->where('id', '!=', $request->user()->id)->get();
 
-        return view('groups.create', compact('users'));
+        return view('groups.create', ['users' => $users]);
     }
 
     public function store(Request $request): RedirectResponse
@@ -48,8 +50,8 @@ class GroupController extends Controller
         $this->authorize('view', $group);
 
         $userDebts = collect($group->calculateUserDebts())
-            ->mapWithKeys(fn ($debts, $userId) => [
-                (string) $userId => collect($debts)->mapWithKeys(fn ($amount, $otherUserId) => [
+            ->mapWithKeys(fn ($debts, $userId): array => [
+                (string) $userId => collect($debts)->mapWithKeys(fn ($amount, $otherUserId): array => [
                     (string) $otherUserId => $amount,
                 ]),
             ]);
@@ -60,14 +62,7 @@ class GroupController extends Controller
         $recentTransactions = $this->getRecentTransactions($group);
         $activeRecurringDebts = $this->getActiveRecurringDebts($group);
 
-        return view('groups.show', compact(
-            'group',
-            'userDebts',
-            'userBalances',
-            'recentSharedDebts',
-            'recentTransactions',
-            'activeRecurringDebts'
-        ));
+        return view('groups.show', ['group' => $group, 'userDebts' => $userDebts, 'userBalances' => $userBalances, 'recentSharedDebts' => $recentSharedDebts, 'recentTransactions' => $recentTransactions, 'activeRecurringDebts' => $activeRecurringDebts]);
     }
 
     public function edit(Group $group): View
@@ -76,7 +71,7 @@ class GroupController extends Controller
 
         $selectedUsers = $group->users;
 
-        return view('groups.edit', compact('group', 'selectedUsers'));
+        return view('groups.edit', ['group' => $group, 'selectedUsers' => $selectedUsers]);
     }
 
     public function update(Request $request, Group $group): RedirectResponse
@@ -118,10 +113,10 @@ class GroupController extends Controller
 
     private function calculateUserBalances(Group $group, Collection $userDebts): Collection
     {
-        return $group->users->mapWithKeys(function ($user) use ($group, $userDebts) {
+        return $group->users->mapWithKeys(function ($user) use ($group, $userDebts): array {
             $userDebtsForUser = $userDebts->get((string) $user->id, collect());
 
-            [$relationships, $totals] = $this->processUserRelationships($user, $userDebtsForUser, $group);
+            [$relationships, $totals] = $this->processUserRelationships($userDebtsForUser, $group);
 
             $netAmount = $totals['owed'] - $totals['owing'];
 
@@ -138,12 +133,12 @@ class GroupController extends Controller
         });
     }
 
-    private function processUserRelationships($user, Collection $userDebts, Group $group): array
+    private function processUserRelationships(Collection $userDebts, Group $group): array
     {
         $relationships = collect();
         $totals = ['owed' => 0, 'owing' => 0];
 
-        $userDebts->each(function ($amount, $otherUserId) use (&$relationships, &$totals, $group) {
+        $userDebts->each(function ($amount, $otherUserId) use (&$relationships, &$totals, $group): void {
             $otherUser = $group->users->firstWhere('id', $otherUserId);
             $formattedAmount = number_format(abs($amount), 2);
 
@@ -184,7 +179,7 @@ class GroupController extends Controller
             ->latest()
             ->take(3)
             ->get()
-            ->map(fn ($debt) => [
+            ->map(fn ($debt): array => [
                 'debt' => $debt,
                 'shares' => $debt->getUserShares(),
                 'can_edit' => $debt->created_by === auth()->id(),
@@ -197,7 +192,7 @@ class GroupController extends Controller
             ->latest()
             ->take(3)
             ->get()
-            ->map(fn ($transaction) => [
+            ->map(fn ($transaction): array => [
                 'transaction' => $transaction,
                 'can_edit' => $transaction->payer_id === auth()->id(),
             ]);

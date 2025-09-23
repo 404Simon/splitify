@@ -1,12 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\View\Components;
 
-use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
 
-class UserListDisplay extends Component
+final class UserListDisplay extends Component
 {
     public $users;
 
@@ -25,7 +26,7 @@ class UserListDisplay extends Component
     /**
      * Get the view / contents that represent the component.
      */
-    public function render(): View|Closure|string
+    public function render(): View
     {
         return view('components.user-list-display');
     }

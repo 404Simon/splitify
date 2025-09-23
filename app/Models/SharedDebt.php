@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -7,18 +9,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-class SharedDebt extends Model
+final class SharedDebt extends Model
 {
     use HasFactory;
 
     protected $fillable = ['group_id', 'created_by', 'name', 'amount', 'recurring_shared_debt_id'];
-
-    protected function casts(): array
-    {
-        return [
-            'amount' => 'float',
-        ];
-    }
 
     public function group(): BelongsTo
     {
@@ -45,20 +40,23 @@ class SharedDebt extends Model
         $users = $this->users;
         $sharePerUser = $this->amount / $users->count();
 
-        return $users->map(function ($user) use ($sharePerUser) {
-            return [
-                'user' => $user,
-                'amount' => $sharePerUser,
-            ];
-        });
+        return $users->map(fn ($user): array => [
+            'user' => $user,
+            'amount' => $sharePerUser,
+        ]);
     }
 
     public function calculateIndividualDebts()
     {
         $sharePerUser = $this->amount / $this->users->count();
 
-        return $this->users->mapWithKeys(function ($user) use ($sharePerUser) {
-            return [$user->id => $sharePerUser];
-        });
+        return $this->users->mapWithKeys(fn ($user): array => [$user->id => $sharePerUser]);
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'amount' => 'float',
+        ];
     }
 }
