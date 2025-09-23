@@ -28,6 +28,11 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        // Check if user was invited and redirect to invite page
+        if ($inviteToken = session('invite_token')) {
+            return redirect()->route('invites.show', ['uuid' => $inviteToken]);
+        }
+
         return redirect()->intended(route('groups.index', absolute: false));
     }
 

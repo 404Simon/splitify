@@ -45,6 +45,11 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
+        // Check if user was invited and redirect to invite page
+        if ($inviteToken = session('invite_token')) {
+            return redirect()->route('invites.show', ['uuid' => $inviteToken]);
+        }
+
         return redirect(route('groups.index', absolute: false));
     }
 }
