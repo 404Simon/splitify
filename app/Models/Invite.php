@@ -3,11 +3,14 @@
 namespace App\Models;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
 class Invite extends Model
 {
+    use HasFactory;
+
     protected $primaryKey = 'uuid';
 
     public $incrementing = false;
@@ -19,16 +22,20 @@ class Invite extends Model
         'duration_days',
     ];
 
+    protected $casts = [
+        'is_reusable' => 'boolean',
+    ];
+
     protected static function booted(): void
     {
         static::creating(function (Model $model) {
             if (empty($model->uuid)) {
                 $model->uuid = Str::uuid()->toString();
             }
-            if (empty($model->is_reusable)) {
+            if (is_null($model->is_reusable)) {
                 $model->is_reusable = false;
             }
-            if (empty($model->duration_days)) {
+            if (is_null($model->duration_days) || $model->duration_days < 1) {
                 $model->duration_days = 1;
             }
         });
