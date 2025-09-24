@@ -105,6 +105,9 @@ final class MapController extends Controller
 
             $validated['lat'] = $coordinates['lat'];
             $validated['lon'] = $coordinates['lon'];
+        } else {
+            $validated['lat'] = $mapMarker->lat;
+            $validated['lon'] = $mapMarker->lon;
         }
 
         $mapMarker->update([
