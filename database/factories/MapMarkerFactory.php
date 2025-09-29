@@ -25,7 +25,7 @@ final class MapMarkerFactory extends Factory
             'created_by' => User::factory(),
             'emoji' => fake()->randomElement(['🏠', '🏢', '🍕', '☕', '🎬', '🛒', '⛽', '🏥', '🎭', '🍽️']),
             'name' => fake()->company(),
-            'description' => fake()->optional()->sentence(),
+            'description' => fake()->sentence(),
             'address' => fake()->address(),
             'lat' => fake()->latitude(),
             'lon' => fake()->longitude(),
