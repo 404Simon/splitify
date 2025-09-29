@@ -318,31 +318,93 @@ test('map marker update only geocodes when address changes', function () {
     expect($mapMarker->lon)->toBe(10.0);
 });
 
-test('map marker update fails when new address cannot be geocoded', function () {
-    Http::fake([
-        '*' => Http::response([], 200),
-    ]);
-
+test('map marker update preserves nullable fields when not provided', function () {
     $user = User::factory()->create();
     $group = Group::factory()->createdBy($user)->create();
     $mapMarker = MapMarker::factory()->forGroup($group)->createdBy($user)->create([
-        'address' => 'Valid Address',
-        'lat' => 12.34,
-        'lon' => 12.34,
+        'name' => 'Original Name',
+        'description' => 'Original description',
+        'address' => 'Original Address',
+        'emoji' => '🏠',
+        'lat' => 50.0,
+        'lon' => 10.0,
     ]);
 
     $this->actingAs($user);
 
+    // Update only required fields - should preserve nullable ones
     $response = $this->put("/groups/{$group->id}/mapMarkers/{$mapMarker->id}", [
         'name' => 'Updated Name',
-        'address' => 'Invalid New Address',
+        'address' => 'Original Address', // Same address to avoid geocoding
     ]);
 
-    $response->assertRedirect()
-        ->assertSessionHas('error', 'Could not find address..');
+    $response->assertRedirect("/groups/{$group->id}/mapMarkers")
+        ->assertSessionHas('success', 'Map marker updated successfully.');
 
     $mapMarker->refresh();
-    expect($mapMarker->address)->toBe('Valid Address');
-    expect($mapMarker->lat)->toBe(12.34);
-    expect($mapMarker->lon)->toBe(12.34);
+    expect($mapMarker->name)->toBe('Updated Name');
+    expect($mapMarker->description)->toBe('Original description'); // Should be preserved
+    expect($mapMarker->emoji)->toBe('🏠'); // Should be preserved
+    expect($mapMarker->address)->toBe('Original Address');
+});
+
+test('map marker update can clear nullable fields when explicitly provided as empty', function () {
+    $user = User::factory()->create();
+    $group = Group::factory()->createdBy($user)->create();
+    $mapMarker = MapMarker::factory()->forGroup($group)->createdBy($user)->create([
+        'name' => 'Original Name',
+        'description' => 'Original description',
+        'address' => 'Original Address',
+        'emoji' => '🏠',
+        'lat' => 50.0,
+        'lon' => 10.0,
+    ]);
+
+    $this->actingAs($user);
+
+    // Explicitly provide empty values for nullable fields
+    $response = $this->put("/groups/{$group->id}/mapMarkers/{$mapMarker->id}", [
+        'name' => 'Updated Name',
+        'description' => '', // Explicitly empty
+        'address' => 'Original Address',
+        'emoji' => '', // Explicitly empty
+    ]);
+
+    $response->assertRedirect("/groups/{$group->id}/mapMarkers")
+        ->assertSessionHas('success', 'Map marker updated successfully.');
+
+    $mapMarker->refresh();
+    expect($mapMarker->name)->toBe('Updated Name');
+    expect($mapMarker->description)->toBeNull(); // Should be null
+    expect($mapMarker->emoji)->toBe('📍'); // Should be default emoji
+    expect($mapMarker->address)->toBe('Original Address');
+});
+
+test('map marker creation sets default values for optional fields when not provided', function () {
+    Http::fake([
+        '*' => Http::response([
+            [
+                'lat' => '49.4521',
+                'lon' => '11.0767',
+            ],
+        ], 200),
+    ]);
+
+    $user = User::factory()->create();
+    $group = Group::factory()->createdBy($user)->create();
+
+    $this->actingAs($user);
+
+    $response = $this->post("/groups/{$group->id}/mapMarkers", [
+        'name' => 'Minimal Marker',
+        'address' => 'Main Street 123',
+        // no description and emoji
+    ]);
+
+    $response->assertRedirect("/groups/{$group->id}/mapMarkers")
+        ->assertSessionHas('success', 'Map marker created successfully.');
+
+    $mapMarker = MapMarker::where('name', 'Minimal Marker')->first();
+    expect($mapMarker->description)->toBeNull();
+    expect($mapMarker->emoji)->toBe('📍');
 });

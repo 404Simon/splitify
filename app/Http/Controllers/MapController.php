@@ -8,6 +8,7 @@ use App\Models\Group;
 use App\Models\MapMarker;
 use App\Services\GeolocationService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Gate;
 
 final class MapController extends Controller
@@ -57,16 +58,23 @@ final class MapController extends Controller
             return redirect()->back()->with('error', 'Could not find address..');
         }
 
-        MapMarker::create([
+        $emoji = Arr::get($validated, 'emoji');
+        if (empty($emoji)) {
+            $emoji = '📍';
+        }
+
+        $createData = [
             'group_id' => $group->id,
             'created_by' => auth()->id(),
             'name' => $validated['name'],
-            'description' => $validated['description'] ?? '',
+            'description' => Arr::get($validated, 'description'),
             'address' => $validated['address'],
             'lat' => $coordinates['lat'],
             'lon' => $coordinates['lon'],
-            'emoji' => $validated['emoji'] ?? '📍',
-        ]);
+            'emoji' => $emoji,
+        ];
+
+        MapMarker::create($createData);
 
         return redirect()->route('groups.mapMarkers.index', $group->id)->with('success', 'Map marker created successfully.');
     }
@@ -110,14 +118,23 @@ final class MapController extends Controller
             $validated['lon'] = $mapMarker->lon;
         }
 
-        $mapMarker->update([
+        $updateData = [
             'name' => $validated['name'],
-            'description' => $validated['description'] ?? '',
             'address' => $validated['address'],
             'lat' => $validated['lat'],
             'lon' => $validated['lon'],
-            'emoji' => $validated['emoji'] ?? '📍',
-        ]);
+        ];
+
+        if (Arr::has($validated, 'description')) {
+            $updateData['description'] = Arr::get($validated, 'description');
+        }
+
+        if (Arr::has($validated, 'emoji')) {
+            $emoji = Arr::get($validated, 'emoji');
+            $updateData['emoji'] = empty($emoji) ? '📍' : $emoji;
+        }
+
+        $mapMarker->update($updateData);
 
         return redirect()->route('groups.mapMarkers.index', $group->id)->with('success', 'Map marker updated successfully.');
     }

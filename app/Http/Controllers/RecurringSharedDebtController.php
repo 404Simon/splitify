@@ -8,6 +8,7 @@ use App\Models\Group;
 use App\Models\RecurringSharedDebt;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\View\View;
 
@@ -62,9 +63,9 @@ final class RecurringSharedDebtController extends Controller
             'amount' => $validated['amount'],
             'frequency' => $validated['frequency'],
             'start_date' => $validated['start_date'],
-            'end_date' => $validated['end_date'],
+            'end_date' => Arr::get($validated, 'end_date'),
             'next_generation_date' => $validated['start_date'],
-            'description' => $validated['description'],
+            'description' => Arr::get($validated, 'description'),
         ]);
 
         $recurringDebt->users()->attach($validated['members']);
@@ -112,14 +113,22 @@ final class RecurringSharedDebtController extends Controller
                 ->withInput();
         }
 
-        $recurringDebt->update([
+        $updateData = [
             'name' => $validated['name'],
             'amount' => $validated['amount'],
             'frequency' => $validated['frequency'],
-            'end_date' => $validated['end_date'],
-            'description' => $validated['description'],
             'is_active' => $validated['is_active'] ?? true,
-        ]);
+        ];
+
+        if (Arr::has($validated, 'end_date')) {
+            $updateData['end_date'] = Arr::get($validated, 'end_date');
+        }
+
+        if (Arr::has($validated, 'description')) {
+            $updateData['description'] = Arr::get($validated, 'description');
+        }
+
+        $recurringDebt->update($updateData);
 
         $recurringDebt->users()->sync($validated['members']);
 

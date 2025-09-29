@@ -7,6 +7,7 @@ namespace App\Http\Controllers;
 use App\Models\Group;
 use App\Models\Invite;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
@@ -31,9 +32,7 @@ final class InviteController extends Controller
         ]);
 
         $validated['group_id'] = $group->id;
-        if (! array_key_exists('is_reusable', $validated)) {
-            $validated['is_reusable'] = false;
-        }
+        $validated['is_reusable'] = Arr::get($validated, 'is_reusable', false);
 
         Invite::create($validated);
 

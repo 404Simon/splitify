@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use Carbon\Carbon;
+use Carbon\CarbonImmutable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -12,6 +13,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 final class RecurringSharedDebt extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'group_id',
         'created_by',
@@ -53,7 +56,7 @@ final class RecurringSharedDebt extends Model
         return $this->hasMany(SharedDebt::class, 'recurring_shared_debt_id');
     }
 
-    public function calculateNextGenerationDate(): Carbon
+    public function calculateNextGenerationDate(): CarbonImmutable
     {
         $current = $this->next_generation_date;
 
