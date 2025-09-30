@@ -123,7 +123,7 @@
                                         </x-enhanced-button>
 
                                         @can('update', $debt)
-                                            @if ($debt->is_active)
+                                            @if ($debt->is_active && (!$debt->end_date || now()->lte($debt->end_date)))
                                                 <form
                                                     action="{{ route('groups.recurring-debts.generate-now', [$group, $debt]) }}"
                                                     method="POST" class="inline">

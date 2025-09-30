@@ -151,11 +151,7 @@ final class RecurringSharedDebtFactory extends Factory
      */
     public function configure(): static
     {
-        return $this->afterCreating(function (RecurringSharedDebt $debt): void {
-            // Attach some users to the recurring debt
-            $users = $debt->group->users()->inRandomOrder()->limit(fake()->numberBetween(2, 4))->get();
-            $debt->users()->attach($users->pluck('id'));
-        });
+        return $this;
     }
 
     /**
@@ -165,6 +161,18 @@ final class RecurringSharedDebtFactory extends Factory
     {
         return $this->afterCreating(function (RecurringSharedDebt $debt) use ($userIds): void {
             $debt->users()->attach($userIds);
+        });
+    }
+
+    /**
+     * Auto-attach random users from the group.
+     */
+    public function withRandomUsers(): static
+    {
+        return $this->afterCreating(function (RecurringSharedDebt $debt): void {
+            // Attach some users to the recurring debt
+            $users = $debt->group->users()->inRandomOrder()->limit(fake()->numberBetween(2, 4))->get();
+            $debt->users()->attach($users->pluck('id'));
         });
     }
 }

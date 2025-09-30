@@ -244,11 +244,13 @@
                             <div class="p-4 sm:p-6">
                                 <h3 class="text-lg font-semibold text-red-900 dark:text-red-400 mb-4">Danger Zone</h3>
                                 <form action="{{ route('groups.recurring-debts.destroy', [$group, $recurringDebt]) }}"
-                                    method="POST"
-                                    onsubmit="return confirm('Are you sure? This will delete the recurring debt but keep all generated debts.')">
+                                    method="POST" id="deleteRecurringDebtForm" style="display: none;">
                                     @csrf
                                     @method('DELETE')
-                                    <x-enhanced-button type="submit" variant="danger" fullWidth="true">
+                                </form>
+                                <div x-data>
+                                    <x-enhanced-button variant="danger" type="button" fullWidth="true"
+                                        x-on:click="$dispatch('open-modal', 'delete-recurring-debt-modal')">
                                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor"
                                             viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -256,7 +258,7 @@
                                         </svg>
                                         Delete Recurring Debt
                                     </x-enhanced-button>
-                                </form>
+                                </div>
                             </div>
                         </div>
                     @endcan
@@ -264,4 +266,9 @@
             </div>
         </div>
     </div>
+
+    <!-- Delete Confirmation Modal -->
+    <x-confirmation-modal name="delete-recurring-debt-modal" title="Delete {{ $recurringDebt->name }}"
+        description="Are you sure you want to delete this recurring debt? This will delete the recurring debt but keep all generated debts."
+        confirm-text="Delete" cancel-text="Cancel" variant="danger" form-id="deleteRecurringDebtForm" />
 </x-app-layout>

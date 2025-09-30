@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Carbon\CarbonImmutable;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -111,26 +112,28 @@ final class RecurringSharedDebt extends Model
         ]);
     }
 
-    public function getFrequencyLabelAttribute(): string
+    public function frequencyLabel(): Attribute
     {
-        return match ($this->frequency) {
+        return Attribute::get(fn (): string => match ($this->frequency) {
             'daily' => 'Daily',
             'weekly' => 'Weekly',
             'monthly' => 'Monthly',
             'yearly' => 'Yearly',
-        };
+        });
     }
 
-    public function getStatusAttribute(): string
+    public function status(): Attribute
     {
-        if (! $this->is_active) {
-            return 'Inactive';
-        }
+        return Attribute::get(function (): string {
+            if (! $this->is_active) {
+                return 'Inactive';
+            }
 
-        if ($this->end_date && now()->gt($this->end_date)) {
-            return 'Expired';
-        }
+            if ($this->end_date && now()->gt($this->end_date)) {
+                return 'Expired';
+            }
 
-        return 'Active';
+            return 'Active';
+        });
     }
 }

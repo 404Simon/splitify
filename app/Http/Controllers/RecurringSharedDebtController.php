@@ -97,6 +97,7 @@ final class RecurringSharedDebtController extends Controller
             'name' => 'required|string|max:255',
             'amount' => 'required|numeric|min:0.01',
             'frequency' => 'required|in:daily,weekly,monthly,yearly',
+            'start_date' => 'required|date',
             'end_date' => 'nullable|date|after:start_date',
             'description' => 'nullable|string|max:1000',
             'is_active' => 'boolean',
@@ -117,6 +118,7 @@ final class RecurringSharedDebtController extends Controller
             'name' => $validated['name'],
             'amount' => $validated['amount'],
             'frequency' => $validated['frequency'],
+            'start_date' => $validated['start_date'],
             'is_active' => $validated['is_active'] ?? true,
         ];
 

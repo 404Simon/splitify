@@ -34,6 +34,10 @@
                     <x-input-error :messages="$errors->get('frequency')" class="mt-2" />
                 </div>
 
+                <x-input-with-label label="Start Date" name="start_date" type="date" :value="old('start_date', $recurringDebt->start_date->format('Y-m-d'))" required />
+            </div>
+
+            <div>
                 <x-input-with-label label="End Date (Optional)" name="end_date" type="date" min="{{ date('Y-m-d') }}"
                     :value="old('end_date', $recurringDebt->end_date?->format('Y-m-d'))" />
             </div>
