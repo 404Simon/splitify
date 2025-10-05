@@ -33,10 +33,10 @@ $maxWidth = [
     }"
     x-init="$watch('show', value => {
         if (value) {
-            document.body.classList.add('overflow-y-hidden');
+            document.body.style.overflow = 'hidden';
             {{ $attributes->has('focusable') ? 'setTimeout(() => firstFocusable().focus(), 100)' : '' }}
         } else {
-            document.body.classList.remove('overflow-y-hidden');
+            document.body.style.overflow = '';
         }
     })"
     x-on:open-modal.window="$event.detail == '{{ $name }}' ? show = true : null"
