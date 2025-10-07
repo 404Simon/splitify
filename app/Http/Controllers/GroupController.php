@@ -15,7 +15,7 @@ final class GroupController extends Controller
 {
     public function index(Request $request): View
     {
-        $groups = $request->user()->groups()->get();
+        $groups = $request->user()->groups()->latest()->get();
 
         return view('groups.index', ['groups' => $groups]);
     }
