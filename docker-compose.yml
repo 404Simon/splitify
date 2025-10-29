@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  splitify:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:80"
+    volumes:
+      # Persist SQLite database
+      - ./database/database.sqlite:/var/www/html/database/database.sqlite
+      # Persist storage
+      - ./storage:/var/www/html/storage
+    environment:
+      - APP_NAME=Splitify
+      - APP_ENV=production
+      - APP_DEBUG=false
+      - APP_URL=http://localhost:8000
+      - DB_CONNECTION=sqlite
+      - DB_DATABASE=/var/www/html/database/database.sqlite
+      - SESSION_DRIVER=database
+      - QUEUE_CONNECTION=database
+      - CACHE_STORE=database
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
