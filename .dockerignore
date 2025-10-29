@@ -1,0 +1,52 @@
+# Git
+.git
+.github
+.gitignore
+.gitattributes
+
+# IDE
+.idea
+.vscode
+.nova
+.fleet
+.zed
+.cursor
+
+# Node
+node_modules
+npm-debug.log
+yarn-error.log
+
+# Composer
+/vendor
+
+# Environment files
+.env
+.env.backup
+.env.production
+
+# Build artifacts
+/public/build
+/public/hot
+/public/storage
+
+# Testing
+.phpunit.cache
+.phpunit.result.cache
+tests/Browser/Screenshots
+
+# Logs
+/storage/*.key
+/storage/pail
+
+# Other
+Homestead.json
+Homestead.yaml
+auth.json
+.phpactor.json
+
+# Documentation
+README.md
+CLAUDE.md
+AGENTS.md
+LICENSE
