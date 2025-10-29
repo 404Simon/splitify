@@ -1,51 +1,28 @@
-# Multi-stage build for Splitify Laravel application with SQLite
+# Dockerfile for Splitify Laravel application with SQLite
+# Using Debian-based PHP image for better package availability
 
-# Stage 1: Build frontend assets
-FROM node:20-alpine AS frontend-builder
+FROM php:8.4-fpm
 
-WORKDIR /app
-
-# Copy package files
-COPY package*.json ./
-
-# Install dependencies
-RUN npm ci
-
-# Copy source files needed for build
-COPY vite.config.js ./
-COPY postcss.config.js ./
-COPY tailwind.config.js ./
-COPY resources ./resources
-COPY public ./public
-
-# Build frontend assets
-RUN npm run build
-
-# Stage 2: Production PHP image
-FROM php:8.4-fpm-alpine
-
-# Install system dependencies and PHP extensions
-RUN apk add --no-cache \
-    bash \
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
     git \
-    sqlite \
-    sqlite-dev \
+    curl \
     libpng-dev \
-    oniguruma-dev \
+    libonig-dev \
     libxml2-dev \
     zip \
     unzip \
-    curl \
+    sqlite3 \
+    libsqlite3-dev \
     nginx \
     supervisor \
-    && docker-php-ext-install \
-    pdo_sqlite \
-    mbstring \
-    exif \
-    pcntl \
-    bcmath \
-    gd \
-    opcache
+    nodejs \
+    npm \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install PHP extensions
+RUN docker-php-ext-install pdo_sqlite mbstring exif pcntl bcmath gd opcache
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -62,8 +39,8 @@ RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist
 # Copy application files
 COPY . .
 
-# Copy built frontend assets from frontend-builder stage
-COPY --from=frontend-builder /app/public/build ./public/build
+# Install NPM dependencies and build frontend assets
+RUN npm install && npm run build
 
 # Generate optimized autoloader
 RUN composer dump-autoload --optimize
@@ -84,7 +61,9 @@ RUN echo "opcache.enable=1" >> /usr/local/etc/php/conf.d/opcache.ini \
 
 # Configure Nginx
 COPY docker/nginx.conf /etc/nginx/nginx.conf
-COPY docker/default.conf /etc/nginx/http.d/default.conf
+COPY docker/default.conf /etc/nginx/sites-available/default
+RUN ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default \
+    && rm -f /etc/nginx/sites-enabled/default.dpkg-dist
 
 # Configure Supervisor
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
