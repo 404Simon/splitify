@@ -5,7 +5,28 @@ Split your bills with friends.
 ## Install
 
 This is a Laravel application with the Laravel Breeze starter kit.
-Follow these steps to get the application up and running:
+
+### Option 1: Docker (Recommended for Quick Start)
+
+The easiest way to get started is using Docker:
+
+1.  **Clone the Repository**
+
+2.  **Start with Docker Compose:**
+
+    ```bash
+    docker-compose up -d
+    ```
+
+3.  **Access the Application:**
+
+    The application will be available at `http://localhost:8000`
+
+For detailed Docker instructions, troubleshooting, and production deployment, see [DOCKER.md](DOCKER.md).
+
+### Option 2: Manual Installation
+
+Follow these steps to get the application up and running locally:
 
 1.  **Clone the Repository**
 
