@@ -40,6 +40,9 @@ RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist
 COPY . .
 
 # Install NPM dependencies and build frontend assets
+# Note: In a production environment with reliable package mirrors, consider using a multi-stage
+# build to separate frontend building from the runtime image for a smaller final image size.
+# This single-stage approach is used for compatibility with restricted network environments.
 RUN npm install && npm run build
 
 # Generate optimized autoloader
@@ -62,8 +65,8 @@ RUN echo "opcache.enable=1" >> /usr/local/etc/php/conf.d/opcache.ini \
 # Configure Nginx
 COPY docker/nginx.conf /etc/nginx/nginx.conf
 COPY docker/default.conf /etc/nginx/sites-available/default
-RUN ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default \
-    && rm -f /etc/nginx/sites-enabled/default.dpkg-dist
+RUN rm -f /etc/nginx/sites-enabled/* \
+    && ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
 
 # Configure Supervisor
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf

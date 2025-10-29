@@ -130,7 +130,7 @@ The Docker Compose configuration includes a health check that verifies the web s
 
 ### Container won't start
 - Check logs: `docker-compose logs`
-- Ensure ports 8000 is not already in use
+- Ensure port 8000 is not already in use
 - Verify file permissions on mounted volumes
 
 ### Database errors
