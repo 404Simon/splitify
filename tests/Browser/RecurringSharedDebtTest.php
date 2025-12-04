@@ -327,7 +327,7 @@ test('user can cancel recurring debt editing', function () {
     $user = User::factory()->create();
     $group = Group::factory()->createdBy($user)->withUsers(1)->create();
 
-    $recurringDebt = RecurringSharedDebt::factory()->forGroup($group)->createdBy($user)->create([
+    $recurringDebt = RecurringSharedDebt::factory()->forGroup($group)->createdBy($user)->active()->create([
         'name' => 'Original Name',
         'amount' => 100.00,
     ]);
