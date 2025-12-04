@@ -54,14 +54,14 @@ final class GenerateRecurringSharedDebts extends Command
                     $sharedDebt = $recurringDebt->generateSharedDebt();
                     $generatedCount++;
 
-                    $this->info("Generated shared debt '{$sharedDebt->name}' from recurring debt ID {$recurringDebt->id}");
+                    $this->info(sprintf("Generated shared debt '%s' from recurring debt ID %s", $sharedDebt->name, $recurringDebt->id));
                 } catch (Exception $e) {
-                    $this->error("Failed to generate shared debt from recurring debt ID {$recurringDebt->id}: {$e->getMessage()}");
+                    $this->error(sprintf('Failed to generate shared debt from recurring debt ID %s: %s', $recurringDebt->id, $e->getMessage()));
                 }
             }
         }
 
-        $this->info("Successfully generated {$generatedCount} shared debts from recurring debts.");
+        $this->info(sprintf('Successfully generated %d shared debts from recurring debts.', $generatedCount));
 
         return Command::SUCCESS;
     }

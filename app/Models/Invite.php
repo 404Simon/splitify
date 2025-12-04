@@ -53,9 +53,11 @@ final class Invite extends Model
             if (empty($model->uuid)) {
                 $model->uuid = Str::uuid()->toString();
             }
+
             if (is_null($model->is_reusable)) {
                 $model->is_reusable = false;
             }
+
             if (is_null($model->duration_days) || $model->duration_days < 1) {
                 $model->duration_days = 1;
             }

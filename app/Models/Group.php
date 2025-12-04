@@ -70,11 +70,13 @@ final class Group extends Model
                 if (! isset($debts[$userId][$creatorId])) {
                     $debts[$userId][$creatorId] = 0;
                 }
+
                 $debts[$userId][$creatorId] += $amount;
 
                 if (! isset($debts[$creatorId][$userId])) {
                     $debts[$creatorId][$userId] = 0;
                 }
+
                 $debts[$creatorId][$userId] -= $amount;
             }
         }
@@ -88,11 +90,13 @@ final class Group extends Model
             if (! isset($debts[$recipientId][$payerId])) {
                 $debts[$recipientId][$payerId] = 0;
             }
+
             $debts[$recipientId][$payerId] += $amount;  // Recipient effectively owes less to payer
 
             if (! isset($debts[$payerId][$recipientId])) {
                 $debts[$payerId][$recipientId] = 0;
             }
+
             $debts[$payerId][$recipientId] -= $amount;  // Payer owes less to recipient
         }
 

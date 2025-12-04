@@ -130,6 +130,6 @@ final class ShoppingListController extends Controller
 
         $redirect = redirect()->to($route);
 
-        return $message ? $redirect->with('success', $message) : $redirect;
+        return in_array($message, [null, '', '0'], true) ? $redirect : $redirect->with('success', $message);
     }
 }

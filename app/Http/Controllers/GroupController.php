@@ -108,7 +108,7 @@ final class GroupController extends Controller
 
         return redirect()
             ->route('groups.index')
-            ->with('success', "Group '{$groupName}' and all associated data have been deleted successfully!");
+            ->with('success', sprintf("Group '%s' and all associated data have been deleted successfully!", $groupName));
     }
 
     private function calculateUserBalances(Group $group, Collection $userDebts): Collection

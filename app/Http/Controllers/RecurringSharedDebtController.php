@@ -162,7 +162,7 @@ final class RecurringSharedDebtController extends Controller
 
         return redirect()
             ->back()
-            ->with('success', "Recurring shared debt {$status} successfully!");
+            ->with('success', sprintf('Recurring shared debt %s successfully!', $status));
     }
 
     public function generateNow(Group $group, RecurringSharedDebt $recurringDebt): RedirectResponse
