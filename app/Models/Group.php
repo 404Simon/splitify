@@ -45,6 +45,11 @@ final class Group extends Model
         return $this->hasMany(MapMarker::class);
     }
 
+    public function shoppingLists(): HasMany
+    {
+        return $this->hasMany(ShoppingList::class);
+    }
+
     /**
      * @return non-empty-array<(float | int)>[]
      */

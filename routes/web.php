@@ -8,6 +8,7 @@ use App\Http\Controllers\MapController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RecurringSharedDebtController;
 use App\Http\Controllers\SharedDebtController;
+use App\Http\Controllers\ShoppingListController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Middleware\EnsureIsGroupAdmin;
 use App\Http\Middleware\EnsureIsGroupMember;
@@ -38,6 +39,11 @@ Route::middleware('auth')->group(function () {
         Route::resource('recurring-debts', RecurringSharedDebtController::class);
         Route::patch('recurring-debts/{recurringDebt}/toggle-active', [RecurringSharedDebtController::class, 'toggleActive'])->name('recurring-debts.toggle-active');
         Route::post('recurring-debts/{recurringDebt}/generate-now', [RecurringSharedDebtController::class, 'generateNow'])->name('recurring-debts.generate-now');
+
+        Route::resource('shoppingLists', ShoppingListController::class);
+        Route::post('shoppingLists/{shoppingList}/items', [ShoppingListController::class, 'addItem'])->name('shoppingLists.items.store');
+        Route::patch('shoppingLists/{shoppingList}/items/{item}/toggle', [ShoppingListController::class, 'toggleItem'])->name('shoppingLists.items.toggle');
+        Route::delete('shoppingLists/{shoppingList}/items/{item}', [ShoppingListController::class, 'deleteItem'])->name('shoppingLists.items.destroy');
 
         // Route::post('/generate-invite', [GroupController::class, 'generateInvite'])->name('groups.generateInvite');
         Route::get('map', [MapController::class, 'displayMap'])->name('map.display');
