@@ -66,6 +66,12 @@ To setup Splitify in Production we provide a `docker-compose.yml`. We choose to 
     wget -O .env https://raw.githubusercontent.com/404Simon/splitify/refs/heads/main/.env.production.example
     ```
 
+    - edit the `.env` file and at least change the `APP_URL` to your desired domain (e.g. `https://splitify.example.com`)
+
+> [!WARNING]
+> The default configuration sets `APP_ENV` to `production`. This will not allow http requests. If you want to test it locally without your reverse proxy in place, change the `APP_ENV` to `local`.
+
+
 2. **Generate a secret key:**
 
     ```bash
@@ -87,7 +93,7 @@ To setup Splitify in Production we provide a `docker-compose.yml`. We choose to 
 
 If you didn't change the `SERVER_NAME` and port-mapping in the `docker-compose.yml`, the app should now be accessible on port 8080. If your reverse proxy of choice supports accessing your apps via docker networking you should use that and remove the port-mapping entirely.
 
-### Files created:
+### Files created
 
 - `.env` - Environment configuration
 - `database.sqlite` - SQLite database file
