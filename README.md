@@ -63,20 +63,20 @@ To setup Splitify in Production we provide a `docker-compose.yml`. We choose to 
 
     ```bash
     wget -O docker-compose.yml https://raw.githubusercontent.com/404Simon/splitify/refs/heads/main/docker-compose.yml
-    wget -O .env https://raw.githubusercontent.com/404Simon/splitify/refs/heads/main/.env.production
+    wget -O .env https://raw.githubusercontent.com/404Simon/splitify/refs/heads/main/.env.production.example
     ```
 
 2. **Generate a secret key:**
 
     ```bash
-    docker run --rm -v ./.env:/app/.env -w /app splitify php artisan key:generate
+    docker run --rm -v ./.env:/app/.env -w /app ghcr.io/404simon/splitify:latest php artisan key:generate
     ```
 
 3. **Create and migrate the DB:**
 
     ```bash
     touch database.sqlite
-    docker run --rm -v ./database.sqlite:/app/database/database.sqlite splitify php artisan migrate --force
+    docker run --rm -v ./database.sqlite:/app/database/database.sqlite ghcr.io/404simon/splitify:latest php artisan migrate --force
     ```
 
 4. **Start application:**

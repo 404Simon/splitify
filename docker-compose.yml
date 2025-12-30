@@ -1,6 +1,6 @@
 services:
   splitify:
-    image: splitify:latest
+    image: ghcr.io/404simon/splitify:latest
     restart: always
     environment:
       - SERVER_NAME=:8080
