@@ -11,8 +11,8 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 COPY . /app
 
-# Install Node.js and npm
-RUN apt-get update && apt-get install -y curl gnupg && \
+# Install Node.js, npm, git, and unzip
+RUN apt-get update && apt-get install -y curl gnupg git unzip && \
     curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
     apt-get install -y nodejs && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
