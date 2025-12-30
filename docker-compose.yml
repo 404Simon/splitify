@@ -1,0 +1,16 @@
+services:
+  splitify:
+    image: splitify:latest
+    restart: always
+    environment:
+      - SERVER_NAME=:8080
+    ports:
+      - "8080:8080" # HTTP <- if possible dont expose this and use docker networking to plug in your reverseproxy of choice
+    volumes:
+      - ./database.sqlite:/app/database/database.sqlite
+      - ./.env:/app/.env
+      - caddy_data:/data
+      - caddy_config:/config
+volumes: # needed for internal caddy
+  caddy_data:
+  caddy_config:
