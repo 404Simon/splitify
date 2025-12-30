@@ -391,11 +391,11 @@ test('recurring debt shows correct status based on activity and expiration', fun
     visit("/groups/{$group->id}/recurring-debts")
         ->assertNoSmoke()
         ->assertSee('Active Debt')
-        ->assertSee('Active')
+        ->waitForText('Active')
         ->assertSee('Inactive Debt')
-        ->assertSee('Inactive')
+        ->waitForText('Inactive')
         ->assertSee('Expired Debt')
-        ->assertSee('Expired');
+        ->waitForText('Expired');
 });
 
 test('user can access recurring debts index page', function () {
@@ -481,7 +481,7 @@ test('expired recurring debt shows expired status', function () {
     visit("/groups/{$group->id}/recurring-debts")
         ->assertNoSmoke()
         ->assertSee('Old Subscription')
-        ->assertSee('Expired')
+        ->waitForText('Expired')
         ->assertMissing('Generate'); // Button should not be present for expired debts
 });
 
